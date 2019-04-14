@@ -1,5 +1,9 @@
 package com.baeldung.optaplanner;
 
+import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.variable.PlanningVariable;
+
+@PlanningEntity
 public class Schedule {
 
     public enum Type {
@@ -82,6 +86,7 @@ public class Schedule {
         return this.time;
     }
 
+    @PlanningVariable(valueRangeProviderRefs = {"availablePerson"})
     public Person getAssignee() {
         return this.assignee;
     }
