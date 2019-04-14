@@ -6,10 +6,14 @@ import com.baeldung.optaplanner.Time;
 import com.baeldung.optaplanner.Time.Period;
 import com.baeldung.optaplanner.Schedule;
 import com.baeldung.optaplanner.Schedule.Type;
+import com.baeldung.optaplanner.SchedulePlan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SchedulerUnitTest {
 
@@ -151,4 +155,15 @@ public class SchedulerUnitTest {
         );
     }
 
+    @Test
+    public void test_createSchedulePlan() {
+        List<Person> persons = new ArrayList<>();
+        persons.add(new Person("王小明", Gender.MALE, new Time(null, 2, Period.AFTERNOON)));
+
+        List<Schedule> schedules = new ArrayList<>();
+        schedules.add(Schedule.PAP(new Time(1, 3, Period.MORNING)));
+
+        SchedulePlan plan = new SchedulePlan(persons, schedules);
+        assertNotNull(plan);
+    }
 }
