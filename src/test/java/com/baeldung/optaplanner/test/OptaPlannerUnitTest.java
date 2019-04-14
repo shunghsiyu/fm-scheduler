@@ -7,6 +7,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+import org.apache.log4j.BasicConfigurator;
 import java.util.Arrays;
 
 public class OptaPlannerUnitTest {
@@ -15,6 +18,8 @@ public class OptaPlannerUnitTest {
 
     @BeforeAll
     public static void setUp() {
+        BasicConfigurator.configure();
+        Logger.getRootLogger().setLevel(Level.INFO);
 
         unsolvedCourseSchedule = new CourseSchedule();
 
@@ -32,6 +37,7 @@ public class OptaPlannerUnitTest {
         SolverFactory<CourseSchedule> solverFactory = SolverFactory.createFromXmlResource("courseScheduleSolverConfiguration.xml");
         Solver<CourseSchedule> solver = solverFactory.buildSolver();
         CourseSchedule solvedCourseSchedule = solver.solve(unsolvedCourseSchedule);
+        solvedCourseSchedule.printCourseSchedule();
 
         Assert.assertNotNull(solvedCourseSchedule.getScore());
         Assert.assertEquals(-4, solvedCourseSchedule.getScore().getHardScore());
@@ -43,6 +49,7 @@ public class OptaPlannerUnitTest {
         SolverFactory<CourseSchedule> solverFactory = SolverFactory.createFromXmlResource("courseScheduleSolverConfigDrools.xml");
         Solver<CourseSchedule> solver = solverFactory.buildSolver();
         CourseSchedule solvedCourseSchedule = solver.solve(unsolvedCourseSchedule);
+        solvedCourseSchedule.printCourseSchedule();
 
         Assert.assertNotNull(solvedCourseSchedule.getScore());
         Assert.assertEquals(0, solvedCourseSchedule.getScore().getHardScore());
