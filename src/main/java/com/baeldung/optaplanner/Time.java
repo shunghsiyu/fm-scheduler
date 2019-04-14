@@ -1,8 +1,5 @@
 package com.baeldung.optaplanner;
 
-//import org.optaplanner.core.api.domain.entity.PlanningEntity;
-//import org.optaplanner.core.api.domain.variable.PlanningVariable;
-
 public class Time {
 
     public enum Period {
@@ -18,12 +15,10 @@ public class Time {
         this.period = period;
     }
 
-    //@PlanningVariable(valueRangeProviderRefs = {"availableRooms"})
     public Integer getDate() {
         return this.date;
     }
 
-    //@PlanningVariable(valueRangeProviderRefs = {"availablePeriods"})
     public Period getPeriod() {
         return this.period;
     }
