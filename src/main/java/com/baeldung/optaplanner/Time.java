@@ -8,10 +8,12 @@ public class Time {
     }
 
     private Integer date;
+    private Integer dayOfWeek;
     private Period period;
 
-    public Time(Integer date, Period period) {
+    public Time(Integer date, Integer dayOfWeek, Period period) {
         this.date = date;
+        this.dayOfWeek = dayOfWeek;
         this.period = period;
     }
 
@@ -19,16 +21,12 @@ public class Time {
         return this.date;
     }
 
+    public Integer getDayOfWeek() {
+        return this.dayOfWeek;
+    }
+
     public Period getPeriod() {
         return this.period;
-    }
-
-    public void setDate(Integer date) {
-        this.date = date;
-    }
-
-    public void setPeriod(Period period) {
-        this.period = period;
     }
 
 }

@@ -9,9 +9,10 @@ public class SchedulerUnitTest {
 
     @Test
     public void test_createTime() {
-        Time time = new Time(1, Period.MORNING);
+        Time time = new Time(1, 3, Period.MORNING);
         Assert.assertNotNull(time);
         Assert.assertEquals((int) time.getDate(), 1);
+        Assert.assertEquals((int) time.getDayOfWeek(), 3);
         Assert.assertEquals(time.getPeriod(), Period.valueOf("MORNING"));
     }
 
