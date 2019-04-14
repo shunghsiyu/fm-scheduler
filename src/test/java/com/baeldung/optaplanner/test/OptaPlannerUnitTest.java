@@ -4,6 +4,7 @@ import com.baeldung.optaplanner.CourseSchedule;
 import com.baeldung.optaplanner.Lecture;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
@@ -31,7 +32,7 @@ public class OptaPlannerUnitTest {
         unsolvedCourseSchedule.getRoomList().addAll(Arrays.asList(new Integer[] { 1, 2 }));
     }
 
-    @Test
+    @Disabled @Test
     public void test_whenCustomJavaSolver() {
 
         SolverFactory<CourseSchedule> solverFactory = SolverFactory.createFromXmlResource("courseScheduleSolverConfiguration.xml");
@@ -43,7 +44,7 @@ public class OptaPlannerUnitTest {
         Assert.assertEquals(-4, solvedCourseSchedule.getScore().getHardScore());
     }
 
-    @Test
+    @Disabled @Test
     public void test_whenDroolsSolver() {
 
         SolverFactory<CourseSchedule> solverFactory = SolverFactory.createFromXmlResource("courseScheduleSolverConfigDrools.xml");
