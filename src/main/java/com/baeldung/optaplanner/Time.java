@@ -13,6 +13,11 @@ public class Time {
     private Integer date;
     private Period period;
 
+    public Time(Integer date, Period period) {
+        this.date = date;
+        this.period = period;
+    }
+
     //@PlanningVariable(valueRangeProviderRefs = {"availableRooms"})
     public Integer getDate() {
         return this.date;
