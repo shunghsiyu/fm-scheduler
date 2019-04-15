@@ -4,6 +4,8 @@ import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import lombok.EqualsAndHashCode;
 
+import java.time.DayOfWeek;
+
 @PlanningEntity
 @EqualsAndHashCode
 public class Schedule {
@@ -49,8 +51,8 @@ public class Schedule {
     }
 
     public static Schedule W5Slide(Time time) {
-        if (time.getDayOfWeek() != 5) {
-            throw new IllegalArgumentException("W5 Slide should be on weekday 5");
+        if (time.getDayOfWeek() != DayOfWeek.FRIDAY) {
+            throw new IllegalArgumentException("W5 Slide should be on Friday");
         }
         if (time.getPeriod() != Time.Period.AFTERNOON) {
             throw new IllegalArgumentException("W5 Slide should be in the afternoon");
@@ -60,8 +62,8 @@ public class Schedule {
     }
 
     public static Schedule W5Note(Time time) {
-        if (time.getDayOfWeek() != 5) {
-            throw new IllegalArgumentException("W5 Note should be on weekday 5");
+        if (time.getDayOfWeek() != DayOfWeek.FRIDAY) {
+            throw new IllegalArgumentException("W5 Note should be on Friday");
         }
         if (time.getPeriod() != Time.Period.AFTERNOON) {
             throw new IllegalArgumentException("W5 Note should be in the afternoon");
@@ -71,8 +73,8 @@ public class Schedule {
     }
 
     public static Schedule Jingfu(Time time) {
-        if (time.getDayOfWeek() != 2) {
-            throw new IllegalArgumentException("Jingfu should be on weekday 2");
+        if (time.getDayOfWeek() != DayOfWeek.TUESDAY) {
+            throw new IllegalArgumentException("Jingfu should be on Tuesday");
         }
         if (time.getPeriod() != Time.Period.AFTERNOON) {
             throw new IllegalArgumentException("Jingfu should be in the afternoon");

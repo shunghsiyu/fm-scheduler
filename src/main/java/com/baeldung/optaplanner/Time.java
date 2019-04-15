@@ -1,6 +1,9 @@
 package com.baeldung.optaplanner;
-
+ 
 import lombok.EqualsAndHashCode;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 
 @EqualsAndHashCode
 public class Time {
@@ -10,22 +13,25 @@ public class Time {
         AFTERNOON
     }
 
-    private Integer date;
-    private Integer dayOfWeek;
+    private LocalDate date;
     private Period period;
 
-    public Time(Integer date, Integer dayOfWeek, Period period) {
+    public Time(LocalDate date, Period period) {
         this.date = date;
-        this.dayOfWeek = dayOfWeek;
         this.period = period;
     }
 
-    public Integer getDate() {
-        return this.date;
+    public static Time of(Integer year, Integer month, Integer dayOfMonth, Period period) {
+        LocalDate date = LocalDate.of(year, month, dayOfMonth);
+        return new Time(date, period);
     }
 
-    public Integer getDayOfWeek() {
-        return this.dayOfWeek;
+    public Integer getDate() {
+        return this.date.getDayOfMonth();
+    }
+
+    public DayOfWeek getDayOfWeek() {
+        return this.date.getDayOfWeek();
     }
 
     public Period getPeriod() {
