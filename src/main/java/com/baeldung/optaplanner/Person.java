@@ -2,6 +2,9 @@ package com.baeldung.optaplanner;
 
 import lombok.EqualsAndHashCode;
 
+import java.time.DayOfWeek;
+import java.util.List;
+
 @EqualsAndHashCode
 public class Person {
 
@@ -11,13 +14,15 @@ public class Person {
     }
 
     private String name;
-    private Gender gender;
-    @EqualsAndHashCode.Exclude private Time OPDTime;
+    @EqualsAndHashCode.Exclude private Gender gender;
+    @EqualsAndHashCode.Exclude private DayOfWeek OPDDayOfWeek;
+    @EqualsAndHashCode.Exclude private Time.Period OPDPeriod;
     
-    public Person(String name, Gender gender, Time OPDTime) {
+    public Person(String name, Gender gender, DayOfWeek OPDDayOfWeek, Time.Period OPDPeriod) {
         this.name = name;
         this.gender = gender;
-        this.OPDTime = OPDTime;
+        this.OPDDayOfWeek = OPDDayOfWeek;
+        this.OPDPeriod = OPDPeriod;
     }
 
     public String getName() {
@@ -26,10 +31,6 @@ public class Person {
 
     public Gender getGender() {
         return this.gender;
-    }
-
-    public Time getOPDTime() {
-        return this.OPDTime;
     }
 
 }

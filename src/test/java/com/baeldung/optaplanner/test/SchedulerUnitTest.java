@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.score.Score;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,16 +32,15 @@ public class SchedulerUnitTest {
 
     @Test
     public void test_createPerson() {
-        Person person = new Person("王小明", Gender.MALE, new Time(null, 2, Period.AFTERNOON));
+        Person person = new Person("王小明", Gender.MALE, DayOfWeek.TUESDAY, Period.AFTERNOON);
         assertNotNull(person);
         assertEquals(person.getName(), "王小明");
         assertEquals(person.getGender(), Gender.valueOf("MALE"));
-        assertEquals(person.getOPDTime(), new Time(null, 2, Period.AFTERNOON));
     }
 
     @Test
     public void test_assignSchedule() {
-        Person person = new Person("王小明", Gender.MALE, new Time(null, 2, Period.AFTERNOON));
+        Person person = new Person("王小明", Gender.MALE, DayOfWeek.TUESDAY, Period.AFTERNOON);
         Schedule sched = new Schedule(Schedule.Type.JINGFUMEETING, new Time(1, 3, Period.MORNING), null);
         sched.setAssignee(person);
         assertEquals(sched.getAssignee(), person);
@@ -160,7 +160,7 @@ public class SchedulerUnitTest {
 
     @Test
     public void test_createOPDSchedule() {
-        Person person = new Person("王小明", Gender.MALE, new Time(null, 2, Period.AFTERNOON));
+        Person person = new Person("王小明", Gender.MALE, DayOfWeek.TUESDAY, Period.AFTERNOON);
         Schedule sched = Schedule.OPD(new Time(1, 2, Period.AFTERNOON), person);
         assertNotNull(sched);
         assertEquals(sched.getType(), Type.OPD);
@@ -178,7 +178,7 @@ public class SchedulerUnitTest {
     @Test
     public void test_createSchedulePlan() {
         List<Person> persons = new ArrayList<>();
-        persons.add(new Person("王小明", Gender.MALE, new Time(null, 2, Period.AFTERNOON)));
+        persons.add(new Person("王小明", Gender.MALE, DayOfWeek.TUESDAY, Period.AFTERNOON));
 
         List<Schedule> schedules = new ArrayList<>();
         schedules.add(Schedule.PAP(new Time(1, 3, Period.MORNING)));
@@ -200,11 +200,11 @@ public class SchedulerUnitTest {
         schedules.add(s4);
         
         List<Person> persons = new ArrayList<>();
-        Person p1 = new Person("王小明", Gender.MALE, new Time(null, 4, Period.AFTERNOON));
+        Person p1 = new Person("王小明", Gender.MALE, DayOfWeek.THURSDAY, Period.AFTERNOON);
         persons.add(p1);
         s3.setAssignee(p1);
         s4.setAssignee(p1);
-        Person p2 = new Person("陳小美", Gender.FEMALE, new Time(null, 4, Period.MORNING));
+        Person p2 = new Person("陳小美", Gender.FEMALE, DayOfWeek.THURSDAY, Period.MORNING);
         persons.add(p2);
 
         SchedulePlan plan = new SchedulePlan(persons, schedules);
