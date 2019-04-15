@@ -23,12 +23,12 @@ public class SchedulePlan {
 
     @ValueRangeProvider(id = "availablePersons")
     @ProblemFactCollectionProperty
-    public List<Person> getPersons() {
+    public List<Person> getPersonList() {
         return this.persons;
     }
 
     @PlanningEntityCollectionProperty
-    public List<Schedule> getSchedules() {
+    public List<Schedule> getScheduleList() {
         return this.schedules;
     }
 

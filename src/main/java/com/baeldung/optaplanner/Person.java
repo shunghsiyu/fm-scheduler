@@ -1,5 +1,8 @@
 package com.baeldung.optaplanner;
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode
 public class Person {
 
     public enum Gender {
@@ -9,7 +12,7 @@ public class Person {
 
     private String name;
     private Gender gender;
-    private Time OPDTime;
+    @EqualsAndHashCode.Exclude private Time OPDTime;
     
     public Person(String name, Gender gender, Time OPDTime) {
         this.name = name;

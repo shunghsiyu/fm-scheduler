@@ -2,8 +2,10 @@ package com.baeldung.optaplanner;
 
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
+import lombok.EqualsAndHashCode;
 
 @PlanningEntity
+@EqualsAndHashCode
 public class Schedule {
 
     public enum Type {
@@ -17,7 +19,7 @@ public class Schedule {
 
     private Type type;
     private Time time;
-    private Person assignee;
+    @EqualsAndHashCode.Exclude private Person assignee;
 
     public Schedule(Type type, Time time, Person assignee) {
         this.type = type;
