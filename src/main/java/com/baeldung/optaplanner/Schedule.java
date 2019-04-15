@@ -14,7 +14,8 @@ public class Schedule {
         MORNINGMEETING_NOTE,
         W5MEETING_SLIDE,
         W5MEETING_NOTE,
-        JINGFUMEETING
+        JINGFUMEETING,
+        OPD
     }
 
     private Type type;
@@ -78,6 +79,14 @@ public class Schedule {
         }
 
         return new Schedule(Type.JINGFUMEETING, time, null);
+    }
+
+    public static Schedule OPD(Time time, Person assignee) {
+        if (assignee == null) {
+            throw new IllegalArgumentException("OPD requires an assignee");
+        }
+
+        return new Schedule(Type.OPD, time, assignee);
     }
 
     public Type getType() {

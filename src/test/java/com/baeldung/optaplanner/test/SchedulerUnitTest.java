@@ -159,6 +159,23 @@ public class SchedulerUnitTest {
     }
 
     @Test
+    public void test_createOPDSchedule() {
+        Person person = new Person("王小明", Gender.MALE, new Time(null, 2, Period.AFTERNOON));
+        Schedule sched = Schedule.OPD(new Time(1, 2, Period.AFTERNOON), person);
+        assertNotNull(sched);
+        assertEquals(sched.getType(), Type.OPD);
+        assertEquals(sched.getTime(), new Time(1, 2, Period.AFTERNOON));
+    }
+
+    @Test
+    public void test_createOPDScheduleThrowAssignee() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> Schedule.OPD(new Time(1, 3, Period.AFTERNOON), null)
+        );
+    }
+
+    @Test
     public void test_createSchedulePlan() {
         List<Person> persons = new ArrayList<>();
         persons.add(new Person("王小明", Gender.MALE, new Time(null, 2, Period.AFTERNOON)));
