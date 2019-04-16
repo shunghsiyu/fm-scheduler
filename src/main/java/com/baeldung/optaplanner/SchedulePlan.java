@@ -6,17 +6,21 @@ import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 @PlanningSolution
 public class SchedulePlan {
 
+    Logger logger = LoggerFactory.getLogger("SchedulePlan");
+
     private List<Schedule> schedules;
     private List<Person> persons;
     private HardSoftScore score;
 
-    public SchedulePlan(List<Person> person, List<Schedule> schedules) {
+    public SchedulePlan(List<Person> persons, List<Schedule> schedules) {
         this.persons = persons;
         this.schedules = schedules;
     }

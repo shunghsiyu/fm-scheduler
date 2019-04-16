@@ -8,9 +8,13 @@ import com.baeldung.optaplanner.ScoreCalculator;
 import com.baeldung.optaplanner.Schedule;
 import com.baeldung.optaplanner.Schedule.Type;
 import com.baeldung.optaplanner.SchedulePlan;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+import org.apache.log4j.BasicConfigurator;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.score.Score;
@@ -21,8 +25,13 @@ import java.util.List;
 
 public class SchedulerUnitTest {
 
-    @Test
-    public void test_createTime() {
+    @BeforeAll
+    public static void setUp() {
+        BasicConfigurator.configure();
+        Logger.getRootLogger().setLevel(Level.INFO);
+    }
+
+    @Test public void test_createTime() {
         Time time = Time.of(2019, 5, 1, Period.MORNING);
         assertNotNull(time);
         assertEquals((int) time.getDate(), 1);
@@ -32,7 +41,7 @@ public class SchedulerUnitTest {
 
     @Test
     public void test_createPerson() {
-        Person person = new Person("王小明", Gender.MALE, DayOfWeek.TUESDAY, Period.AFTERNOON);
+        Person person = new Person("王小明", Gender.MALE, 2019, 5, DayOfWeek.TUESDAY, Period.AFTERNOON);
         assertNotNull(person);
         assertEquals(person.getName(), "王小明");
         assertEquals(person.getGender(), Gender.valueOf("MALE"));
@@ -40,8 +49,8 @@ public class SchedulerUnitTest {
 
     @Test
     public void test_assignSchedule() {
-        Person person = new Person("王小明", Gender.MALE, DayOfWeek.TUESDAY, Period.AFTERNOON);
-        Schedule sched = new Schedule(Schedule.Type.JINGFUMEETING, Time.of(2019, 5, 1, Period.MORNING), null);
+        Person person = new Person("王小明", Gender.MALE, 2019, 5, DayOfWeek.TUESDAY, Period.AFTERNOON);
+        Schedule sched = new Schedule(Schedule.Type.PAP, Time.of(2019, 5, 1, Period.MORNING), null);
         sched.setAssignee(person);
         assertEquals(sched.getAssignee(), person);
     }
@@ -160,7 +169,7 @@ public class SchedulerUnitTest {
 
     @Test
     public void test_createOPDSchedule() {
-        Person person = new Person("王小明", Gender.MALE, DayOfWeek.TUESDAY, Period.AFTERNOON);
+        Person person = new Person("王小明", Gender.MALE, 2019, 5, DayOfWeek.TUESDAY, Period.AFTERNOON);
         Schedule sched = Schedule.OPD(Time.of(2019, 5, 1, Period.AFTERNOON), person);
         assertNotNull(sched);
         assertEquals(sched.getType(), Type.OPD);
@@ -178,7 +187,7 @@ public class SchedulerUnitTest {
     @Test
     public void test_createSchedulePlan() {
         List<Person> persons = new ArrayList<>();
-        persons.add(new Person("王小明", Gender.MALE, DayOfWeek.TUESDAY, Period.AFTERNOON));
+        persons.add(new Person("王小明", Gender.MALE, 2019, 5, DayOfWeek.TUESDAY, Period.AFTERNOON));
 
         List<Schedule> schedules = new ArrayList<>();
         schedules.add(Schedule.PAP(Time.of(2019, 5, 1, Period.MORNING)));
@@ -188,7 +197,7 @@ public class SchedulerUnitTest {
     }
 
     @Test
-    public void test_calculateScore() {
+    public void test_calculateScore1() {
         List<Schedule> schedules = new ArrayList<>();
         Schedule s1 = Schedule.PAP(Time.of(2019, 5, 1, Period.MORNING));
         schedules.add(s1);
@@ -200,18 +209,36 @@ public class SchedulerUnitTest {
         schedules.add(s4);
         
         List<Person> persons = new ArrayList<>();
-        Person p1 = new Person("王小明", Gender.MALE, DayOfWeek.THURSDAY, Period.AFTERNOON);
+        Person p1 = new Person("王小明", Gender.MALE, 2019, 5, DayOfWeek.THURSDAY, Period.AFTERNOON);
         persons.add(p1);
         s3.setAssignee(p1);
         s4.setAssignee(p1);
-        Person p2 = new Person("陳小美", Gender.FEMALE, DayOfWeek.THURSDAY, Period.MORNING);
+        Person p2 = new Person("陳小美", Gender.FEMALE, 2019, 5, DayOfWeek.THURSDAY, Period.MORNING);
         persons.add(p2);
 
         SchedulePlan plan = new SchedulePlan(persons, schedules);
 
         ScoreCalculator calculator = new ScoreCalculator();
         Score score = calculator.calculateScore(plan);
-        System.out.print(score.toString());
         assertEquals(HardSoftScore.valueOf(-3, 0), score);
     }
+
+    @Test
+    public void test_calculateScore2() {
+        List<Schedule> schedules = new ArrayList<>();
+        Schedule s1 = Schedule.PAP(Time.of(2019, 5, 1, Period.MORNING));
+        schedules.add(s1);
+        
+        List<Person> persons = new ArrayList<>();
+        Person p1 = new Person("王小明", Gender.MALE, 2019, 5, DayOfWeek.WEDNESDAY, Period.MORNING);
+        persons.add(p1);
+        s1.setAssignee(p1);
+
+        SchedulePlan plan = new SchedulePlan(persons, schedules);
+
+        ScoreCalculator calculator = new ScoreCalculator();
+        Score score = calculator.calculateScore(plan);
+        assertEquals(HardSoftScore.valueOf(-1, 0), score);
+    }
+
 }
