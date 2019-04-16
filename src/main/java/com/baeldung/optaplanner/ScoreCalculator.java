@@ -2,15 +2,15 @@ package com.baeldung.optaplanner;
 
 import java.util.HashSet;
 import lombok.EqualsAndHashCode;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.impl.score.director.easy.EasyScoreCalculator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ScoreCalculator implements EasyScoreCalculator<SchedulePlan> {
 
-    Logger logger = LoggerFactory.getLogger("ScoreCalculator");
+    Logger logger = LogManager.getLogger();
 
     @EqualsAndHashCode
     public class PersonAtTime {

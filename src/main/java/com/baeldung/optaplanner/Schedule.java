@@ -2,11 +2,13 @@ package com.baeldung.optaplanner;
 
 import java.time.DayOfWeek;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
 @PlanningEntity
 @EqualsAndHashCode
+@ToString(includeFieldNames = true)
 public class Schedule {
 
     public enum Type {

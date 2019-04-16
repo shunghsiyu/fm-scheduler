@@ -3,8 +3,10 @@ package com.baeldung.optaplanner;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @EqualsAndHashCode
+@ToString
 public class Time {
 
     public enum Period {

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <solver>
-    <scanAnnotatedClasses/>
+    <scanAnnotatedClasses>
+        <packageInclude>com.baeldung.optaplanner</packageInclude>
+    </scanAnnotatedClasses>
 
     <scoreDirectorFactory>
         <easyScoreCalculatorClass>com.baeldung.optaplanner.ScoreCalculator</easyScoreCalculatorClass>

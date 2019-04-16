@@ -6,8 +6,10 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @EqualsAndHashCode
+@ToString(includeFieldNames = true)
 public class Person {
 
     public enum Gender {
@@ -17,7 +19,7 @@ public class Person {
 
     private String name;
     @EqualsAndHashCode.Exclude private Gender gender;
-    @EqualsAndHashCode.Exclude private List<Schedule> opdSchedules;
+    @ToString.Exclude @EqualsAndHashCode.Exclude private List<Schedule> opdSchedules;
 
     public Person(String name, Gender gender, List<Schedule> opdSchedules) {
         this.name = name;

@@ -15,9 +15,9 @@ import com.baeldung.optaplanner.Time.Period;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.DefaultConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.optaplanner.core.api.score.Score;
@@ -29,8 +29,8 @@ public class SchedulerUnitTest {
 
     @BeforeAll
     public static void setUp() {
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.INFO);
+        Configurator.initialize(new DefaultConfiguration());
+        Configurator.setRootLevel(Level.INFO);
     }
 
     @Test
