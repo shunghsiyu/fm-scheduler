@@ -18,18 +18,18 @@ public class Person {
 
     private String name;
     @EqualsAndHashCode.Exclude private Gender gender;
-    @EqualsAndHashCode.Exclude private Integer OPDYear;
-    @EqualsAndHashCode.Exclude private Integer OPDMonth;
-    @EqualsAndHashCode.Exclude private DayOfWeek OPDDayOfWeek;
-    @EqualsAndHashCode.Exclude private Time.Period OPDPeriod;
+    @EqualsAndHashCode.Exclude private List<Schedule> opdSchedules;
     
-    public Person(String name, Gender gender, Integer OPDYear, Integer OPDMonth, DayOfWeek OPDDayOfWeek, Time.Period OPDPeriod) {
+    public Person(String name, Gender gender, List<Schedule> opdSchedules) {
         this.name = name;
         this.gender = gender;
-        this.OPDYear = OPDYear;
-        this.OPDMonth = OPDMonth;
-        this.OPDDayOfWeek = OPDDayOfWeek;
-        this.OPDPeriod = OPDPeriod;
+        this.opdSchedules = opdSchedules;
+    }
+
+    public static Person repeatedSchedule(String name, Gender gender, Integer opdYear, Integer opdMonth, DayOfWeek opdDayOfWeek, Time.Period opdPeriod) {
+        Person person = new Person(name, gender, null);
+        person.opdSchedules = person.generateOPDSchedule(opdYear, opdMonth, opdDayOfWeek, opdPeriod);
+        return person;
     }
 
     public String getName() {
@@ -41,14 +41,18 @@ public class Person {
     }
 
     public List<Schedule> getOPDSchedule() {
+        return this.opdSchedules;
+    }
+
+    private List<Schedule> generateOPDSchedule(Integer opdYear, Integer opdMonth, DayOfWeek opdDayOfWeek, Time.Period opdPeriod) {
         List<Schedule> list = new ArrayList<>();
         
         // Get first DayOfWeek in that month
-        LocalDate baseDate = LocalDate.of(this.OPDYear, this.OPDMonth, 1);
-        LocalDate date = baseDate.with(TemporalAdjusters.firstInMonth(this.OPDDayOfWeek));
+        LocalDate baseDate = LocalDate.of(opdYear, opdMonth, 1);
+        LocalDate date = baseDate.with(TemporalAdjusters.firstInMonth(opdDayOfWeek));
 
-        while (date.getMonthValue() == this.OPDMonth) {
-            list.add(Schedule.OPD(new Time(date, this.OPDPeriod), this));
+        while (date.getMonthValue() == opdMonth) {
+            list.add(Schedule.OPD(new Time(date, opdPeriod), this));
             date = date.plusMonths(1);
         }
         return list;
