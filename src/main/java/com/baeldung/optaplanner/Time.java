@@ -7,7 +7,7 @@ import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
-public class Time {
+public class Time implements Comparable<Time> {
 
     public enum Period {
         MORNING,
@@ -37,5 +37,15 @@ public class Time {
 
     public Period getPeriod() {
         return this.period;
+    }
+
+    @Override
+    public int compareTo(Time other) {
+        int compareDate = this.date.compareTo(other.date);
+        if (compareDate == 0) {
+            return this.period.compareTo(other.period);
+        } else {
+            return compareDate;
+        }
     }
 }

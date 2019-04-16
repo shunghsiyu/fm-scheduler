@@ -3,6 +3,7 @@ package com.baeldung.optaplanner.test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.baeldung.optaplanner.Person;
 import com.baeldung.optaplanner.Person.Gender;
@@ -40,6 +41,24 @@ public class SchedulerUnitTest {
         assertEquals((int) time.getDate(), 1);
         assertEquals(time.getDayOfWeek(), DayOfWeek.WEDNESDAY);
         assertEquals(time.getPeriod(), Period.valueOf("MORNING"));
+    }
+
+    @Test void test_compareTime1() {
+        Time t1 = Time.of(2019, 5, 1, Period.MORNING);
+        Time t2 = Time.of(2019, 5, 1, Period.AFTERNOON);
+        assertTrue(t1.compareTo(t2) < 0);
+    }
+
+    @Test void test_compareTime2() {
+        Time t1 = Time.of(2019, 5, 1, Period.MORNING);
+        Time t2 = Time.of(2019, 5, 1, Period.MORNING);
+        assertTrue(t1.compareTo(t2) == 0);
+    }
+
+    @Test void test_compareTime3() {
+        Time t1 = Time.of(2019, 5, 3, Period.MORNING);
+        Time t2 = Time.of(2019, 5, 1, Period.AFTERNOON);
+        assertTrue(t1.compareTo(t2) > 0);
     }
 
     @Test
@@ -182,6 +201,34 @@ public class SchedulerUnitTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> Schedule.OPD(Time.of(2019, 5, 1, Period.AFTERNOON), null));
+    }
+
+    @Test
+    public void test_compareSchedule1() {
+        Schedule s1 = Schedule.PAP(Time.of(2019, 5, 1, Period.AFTERNOON));
+        Schedule s2 = Schedule.Jingfu(Time.of(2019, 5, 7, Period.AFTERNOON));
+        assertTrue(s1.compareTo(s2) < 0);
+    }
+
+    @Test
+    public void test_compareSchedule2() {
+        Schedule s1 = Schedule.PAP(Time.of(2019, 5, 1, Period.AFTERNOON));
+        Schedule s2 = Schedule.PAP(Time.of(2019, 5, 1, Period.AFTERNOON));
+        assertTrue(s1.compareTo(s2) == 0);
+    }
+
+    @Test
+    public void test_compareSchedule3() {
+        Schedule s1 = Schedule.PAP(Time.of(2019, 5, 7, Period.AFTERNOON));
+        Schedule s2 = Schedule.Jingfu(Time.of(2019, 5, 7, Period.AFTERNOON));
+        assertTrue(s1.compareTo(s2) < 0);
+    }
+
+    @Test
+    public void test_compareSchedule4() {
+        Schedule s1 = Schedule.PAP(Time.of(2019, 5, 1, Period.AFTERNOON));
+        Schedule s2 = Schedule.PAP(Time.of(2019, 5, 1, Period.MORNING));
+        assertTrue(s1.compareTo(s2) > 0);
     }
 
     @Test

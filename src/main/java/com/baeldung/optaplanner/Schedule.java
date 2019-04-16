@@ -9,7 +9,7 @@ import org.optaplanner.core.api.domain.variable.PlanningVariable;
 @PlanningEntity
 @EqualsAndHashCode
 @ToString(includeFieldNames = true)
-public class Schedule {
+public class Schedule implements Comparable<Schedule> {
 
     public enum Type {
         PAP,
@@ -113,5 +113,15 @@ public class Schedule {
 
     public void setAssignee(Person assignee) {
         this.assignee = assignee;
+    }
+
+    @Override
+    public int compareTo(Schedule other) {
+        int compareTime = this.time.compareTo(other.time);
+        if (compareTime == 0) {
+            return this.type.compareTo(other.type);
+        } else {
+            return compareTime;
+        }
     }
 }
