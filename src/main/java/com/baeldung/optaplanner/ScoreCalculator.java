@@ -1,16 +1,15 @@
 package com.baeldung.optaplanner;
 
+import java.util.HashSet;
+import lombok.EqualsAndHashCode;
 import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.impl.score.director.easy.EasyScoreCalculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import lombok.EqualsAndHashCode;
-
-import java.util.HashSet;
 
 public class ScoreCalculator implements EasyScoreCalculator<SchedulePlan> {
-    
+
     Logger logger = LoggerFactory.getLogger("ScoreCalculator");
 
     @EqualsAndHashCode
@@ -40,7 +39,7 @@ public class ScoreCalculator implements EasyScoreCalculator<SchedulePlan> {
         HashSet<PersonAtTime> occupancy = new HashSet<>();
 
         for (Person person : plan.getPersonList()) {
-            for(Schedule sched : person.getOPDSchedule()) {
+            for (Schedule sched : person.getOPDSchedule()) {
                 Time time = sched.getTime();
                 PersonAtTime occupied = new PersonAtTime(person, time);
                 occupancy.add(occupied);
@@ -50,7 +49,7 @@ public class ScoreCalculator implements EasyScoreCalculator<SchedulePlan> {
         for (Schedule sched : plan.getScheduleList()) {
             Person person = sched.getAssignee();
             Time time = sched.getTime();
-            if(person != null) {
+            if (person != null) {
                 PersonAtTime occupied = new PersonAtTime(person, time);
                 if (occupancy.contains(occupied)) {
                     hardScore += -1;

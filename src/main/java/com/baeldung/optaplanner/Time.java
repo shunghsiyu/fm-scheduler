@@ -1,9 +1,8 @@
 package com.baeldung.optaplanner;
- 
-import lombok.EqualsAndHashCode;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode
 public class Time {
@@ -37,5 +36,4 @@ public class Time {
     public Period getPeriod() {
         return this.period;
     }
-
 }

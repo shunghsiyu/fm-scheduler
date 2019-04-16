@@ -1,10 +1,9 @@
 package com.baeldung.optaplanner;
 
+import java.time.DayOfWeek;
+import lombok.EqualsAndHashCode;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
-import lombok.EqualsAndHashCode;
-
-import java.time.DayOfWeek;
 
 @PlanningEntity
 @EqualsAndHashCode
@@ -107,5 +106,4 @@ public class Schedule {
     public void setAssignee(Person assignee) {
         this.assignee = assignee;
     }
-
 }

@@ -1,15 +1,14 @@
 package com.baeldung.optaplanner;
 
-import org.optaplanner.core.api.domain.solution.drools.ProblemFactCollectionProperty;
+import java.util.List;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
+import org.optaplanner.core.api.domain.solution.drools.ProblemFactCollectionProperty;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 @PlanningSolution
 public class SchedulePlan {
@@ -44,5 +43,4 @@ public class SchedulePlan {
     public void setScore(HardSoftScore score) {
         this.score = score;
     }
-
 }
