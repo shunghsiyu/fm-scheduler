@@ -15,9 +15,9 @@ public class Schedule implements Comparable<Schedule> {
         PAP,
         MORNINGMEETING_SLIDE,
         MORNINGMEETING_NOTE,
+        JINGFUMEETING,
         W5MEETING_SLIDE,
         W5MEETING_NOTE,
-        JINGFUMEETING,
         OPD
     }
 
