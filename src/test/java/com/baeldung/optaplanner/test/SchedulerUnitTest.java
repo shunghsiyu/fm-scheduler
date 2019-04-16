@@ -43,19 +43,22 @@ public class SchedulerUnitTest {
         assertEquals(time.getPeriod(), Period.valueOf("MORNING"));
     }
 
-    @Test void test_compareTime1() {
+    @Test
+    void test_compareTime1() {
         Time t1 = Time.of(2019, 5, 1, Period.MORNING);
         Time t2 = Time.of(2019, 5, 1, Period.AFTERNOON);
         assertTrue(t1.compareTo(t2) < 0);
     }
 
-    @Test void test_compareTime2() {
+    @Test
+    void test_compareTime2() {
         Time t1 = Time.of(2019, 5, 1, Period.MORNING);
         Time t2 = Time.of(2019, 5, 1, Period.MORNING);
         assertTrue(t1.compareTo(t2) == 0);
     }
 
-    @Test void test_compareTime3() {
+    @Test
+    void test_compareTime3() {
         Time t1 = Time.of(2019, 5, 3, Period.MORNING);
         Time t2 = Time.of(2019, 5, 1, Period.AFTERNOON);
         assertTrue(t1.compareTo(t2) > 0);
