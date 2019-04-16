@@ -1,5 +1,6 @@
 package com.baeldung.optaplanner;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningScore;
@@ -19,13 +20,18 @@ public class SchedulePlan {
     private List<Person> persons;
     private HardSoftScore score;
 
+    public SchedulePlan() {
+        this.persons = new ArrayList<>();
+        this.schedules = new ArrayList<>();
+    }
+
     public SchedulePlan(List<Person> persons, List<Schedule> schedules) {
         this.persons = persons;
         this.schedules = schedules;
     }
 
-    @ValueRangeProvider(id = "availablePersons")
     @ProblemFactCollectionProperty
+    @ValueRangeProvider(id = "availablePersons")
     public List<Person> getPersonList() {
         return this.persons;
     }

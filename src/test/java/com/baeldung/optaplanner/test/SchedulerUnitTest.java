@@ -22,6 +22,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
+import org.optaplanner.core.api.solver.Solver;
+import org.optaplanner.core.api.solver.SolverFactory;
 
 public class SchedulerUnitTest {
 
@@ -245,5 +247,27 @@ public class SchedulerUnitTest {
         ScoreCalculator calculator = new ScoreCalculator();
         Score score = calculator.calculateScore(plan);
         assertEquals(HardSoftScore.valueOf(-1, 0), score);
+    }
+
+    @Test
+    public void test_whenCustomJavaSolver() {
+        List<Schedule> schedules = new ArrayList<>();
+        Schedule s1 = Schedule.PAP(Time.of(2019, 5, 1, Period.MORNING));
+        schedules.add(s1);
+
+        List<Person> persons = new ArrayList<>();
+        Person p1 =
+                Person.repeatedSchedule(
+                        "王小明", Gender.MALE, 2019, 5, DayOfWeek.FRIDAY, Period.AFTERNOON);
+        persons.add(p1);
+
+        SchedulePlan unsolvedPlan = new SchedulePlan(persons, schedules);
+        SolverFactory<SchedulePlan> solverFactory =
+                SolverFactory.createFromXmlResource("schedulePlanSolverTestConfiguration.xml");
+        Solver<SchedulePlan> solver = solverFactory.buildSolver();
+        SchedulePlan solvedPlan = solver.solve(unsolvedPlan);
+
+        assertNotNull(solvedPlan.getScore());
+        assertEquals(0, solvedPlan.getScore().getHardScore());
     }
 }

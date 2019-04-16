@@ -23,6 +23,12 @@ public class Schedule {
     private Time time;
     @EqualsAndHashCode.Exclude private Person assignee;
 
+    public Schedule() {
+        this.type = null;
+        this.time = null;
+        this.assignee = null;
+    }
+
     public Schedule(Type type, Time time, Person assignee) {
         this.type = type;
         this.time = time;
@@ -98,7 +104,7 @@ public class Schedule {
         return this.time;
     }
 
-    @PlanningVariable(valueRangeProviderRefs = {"availablePerson"})
+    @PlanningVariable(valueRangeProviderRefs = {"availablePersons"})
     public Person getAssignee() {
         return this.assignee;
     }
