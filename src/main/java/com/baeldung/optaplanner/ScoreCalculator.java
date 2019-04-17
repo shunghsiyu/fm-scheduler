@@ -1,7 +1,10 @@
 package com.baeldung.optaplanner;
 
+import java.util.HashMap;
 import java.util.HashSet;
-import lombok.EqualsAndHashCode;
+import java.util.Map;
+import java.util.Set;
+import lombok.Data;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.optaplanner.core.api.score.Score;
@@ -12,23 +15,10 @@ public class ScoreCalculator implements EasyScoreCalculator<SchedulePlan> {
 
     Logger logger = LogManager.getLogger();
 
-    @EqualsAndHashCode
+    @Data
     public class PersonAtTime {
-        private Person person;
-        private Time time;
-
-        public PersonAtTime(Person person, Time time) {
-            this.person = person;
-            this.time = time;
-        }
-
-        public Person getPerson() {
-            return this.person;
-        }
-
-        public Time getTime() {
-            return this.time;
-        }
+        private final Person person;
+        private final Time time;
     }
 
     @Override
@@ -36,13 +26,16 @@ public class ScoreCalculator implements EasyScoreCalculator<SchedulePlan> {
         int hardScore = 0;
         int softScore = 0;
 
-        HashSet<PersonAtTime> occupancy = new HashSet<>();
+        Map<Person, Integer> scheduleCount = new HashMap<>();
+        Set<PersonAtTime> occupancy = new HashSet<>();
 
         for (Person person : plan.getPersonList()) {
             for (Schedule sched : person.getOPDSchedule()) {
                 Time time = sched.getTime();
                 PersonAtTime occupied = new PersonAtTime(person, time);
                 occupancy.add(occupied);
+                Integer count = scheduleCount.getOrDefault(person, 0) + 1;
+                scheduleCount.put(person, count);
             }
         }
 
@@ -56,9 +49,25 @@ public class ScoreCalculator implements EasyScoreCalculator<SchedulePlan> {
                 } else {
                     occupancy.add(occupied);
                 }
+
+                PersonAtTime dayOccupied =
+                        new PersonAtTime(
+                                person, new Time(time.getLocalDate(), time.getPeriod().next()));
+                // The person has other schedule that day
+                if (occupancy.contains(dayOccupied)) {
+                    softScore += -100;
+                }
+
+                Integer count = scheduleCount.getOrDefault(person, 0);
+                scheduleCount.put(person, count + 1);
             } else {
                 hardScore += -1;
             }
+        }
+
+        for (Map.Entry<Person, Integer> entry : scheduleCount.entrySet()) {
+            Integer count = entry.getValue();
+            softScore += -(count * count);
         }
 
         return HardSoftScore.valueOf(hardScore, softScore);

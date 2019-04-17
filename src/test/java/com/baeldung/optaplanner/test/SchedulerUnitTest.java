@@ -21,7 +21,6 @@ import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.logging.log4j.core.config.DefaultConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
@@ -275,8 +274,9 @@ public class SchedulerUnitTest {
         SchedulePlan plan = new SchedulePlan(persons, schedules);
 
         ScoreCalculator calculator = new ScoreCalculator();
-        Score score = calculator.calculateScore(plan);
-        assertEquals(HardSoftScore.valueOf(-3, 0), score);
+        HardSoftScore score = (HardSoftScore) calculator.calculateScore(plan);
+        assertEquals(-3, score.getHardScore());
+        assertEquals(-74, score.getSoftScore());
     }
 
     @Test
@@ -295,8 +295,9 @@ public class SchedulerUnitTest {
         SchedulePlan plan = new SchedulePlan(persons, schedules);
 
         ScoreCalculator calculator = new ScoreCalculator();
-        Score score = calculator.calculateScore(plan);
-        assertEquals(HardSoftScore.valueOf(-1, 0), score);
+        HardSoftScore score = (HardSoftScore) calculator.calculateScore(plan);
+        assertEquals(-1, score.getHardScore());
+        assertEquals(-36, score.getSoftScore());
     }
 
     @Test

@@ -6,12 +6,18 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @EqualsAndHashCode
-@ToString
+@ToString(doNotUseGetters = true)
 public class Time implements Comparable<Time> {
 
     public enum Period {
         MORNING,
-        AFTERNOON
+        AFTERNOON;
+
+        private static Period[] vals = values();
+
+        public Period next() {
+            return vals[(this.ordinal() + 1) % vals.length];
+        }
     }
 
     private LocalDate date;
@@ -25,6 +31,10 @@ public class Time implements Comparable<Time> {
     public static Time of(Integer year, Integer month, Integer dayOfMonth, Period period) {
         LocalDate date = LocalDate.of(year, month, dayOfMonth);
         return new Time(date, period);
+    }
+
+    public LocalDate getLocalDate() {
+        return this.date;
     }
 
     public Integer getDate() {

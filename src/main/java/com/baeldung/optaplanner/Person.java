@@ -62,7 +62,7 @@ public class Person {
 
         while (date.getMonthValue() == opdMonth) {
             list.add(Schedule.OPD(new Time(date, opdPeriod), this));
-            date = date.plusMonths(1);
+            date = date.plusWeeks(1);
         }
         return list;
     }
