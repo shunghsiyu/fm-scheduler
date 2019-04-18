@@ -17,14 +17,25 @@ public class Person {
         FEMALE
     }
 
+    public enum Role {
+        NORMAL,
+        SCR
+    }
+
     private String name;
     @EqualsAndHashCode.Exclude private Gender gender;
+    @EqualsAndHashCode.Exclude private Role role;
     @ToString.Exclude @EqualsAndHashCode.Exclude private List<Schedule> opdSchedules;
 
     public Person(String name, Gender gender, List<Schedule> opdSchedules) {
+        this(name, gender, opdSchedules, Role.NORMAL);
+    }
+
+    public Person(String name, Gender gender, List<Schedule> opdSchedules, Role role) {
         this.name = name;
         this.gender = gender;
         this.opdSchedules = opdSchedules;
+        this.role = role;
     }
 
     public static Person repeatedSchedule(
@@ -50,6 +61,14 @@ public class Person {
 
     public List<Schedule> getOPDSchedule() {
         return this.opdSchedules;
+    }
+
+    public Role getRole() {
+        return this.role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     private List<Schedule> generateOPDSchedule(
