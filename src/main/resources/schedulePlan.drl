@@ -1,0 +1,39 @@
+package com.baeldung.optaplanner
+
+import com.baeldung.optaplanner.Person;
+import com.baeldung.optaplanner.Schedule;
+import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
+
+global HardSoftScoreHolder scoreHolder;
+
+// "每一個排班必須在一個的時間進行" 跟 "每一個排班必須有一個項目" 已經內建
+
+rule "每一個排班必須分派給一個人"
+    when
+        Schedule( assignee == null );
+    then
+        scoreHolder.addHardConstraintMatch(kcontext, -1);
+end
+
+// "每一個排班的時間必須是工作天" 已經內建
+
+// "每一個項目在同一個時間必須不超過一個的在進行" 已經內建
+
+rule "每一個人力在同一個時間必須不被分配超過一個排班"
+    when
+        Schedule($assignee : assignee, $time : time, $type : type, assignee != null)
+        Schedule(assignee == $assignee, time == $time, type != type)
+    then
+        scoreHolder.addHardConstraintMatch(kcontext, -1);
+end
+
+rule "Same number of schedules"
+    when
+        $person : Person()
+        accumulate(
+            $assignment : Schedule(assignee == $person),
+            $total : count($assignment)
+        )
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext, -($total.intValue() * $total.intValue()));
+end

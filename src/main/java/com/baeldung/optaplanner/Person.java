@@ -51,6 +51,29 @@ public class Person {
         return person;
     }
 
+    public Person addOPDSchedule(
+            Integer opdYear, Integer opdMonth, DayOfWeek opdDayOfWeek, Time.Period opdPeriod) {
+        List<Schedule> additionalSchedules =
+                this.generateOPDSchedule(opdYear, opdMonth, opdDayOfWeek, opdPeriod);
+        this.opdSchedules.addAll(additionalSchedules);
+        return this;
+    }
+
+    private List<Schedule> generateOPDSchedule(
+            Integer opdYear, Integer opdMonth, DayOfWeek opdDayOfWeek, Time.Period opdPeriod) {
+        List<Schedule> list = new ArrayList<>();
+
+        // Get first DayOfWeek in that month
+        LocalDate baseDate = LocalDate.of(opdYear, opdMonth, 1);
+        LocalDate date = baseDate.with(TemporalAdjusters.firstInMonth(opdDayOfWeek));
+
+        while (date.getMonthValue() == opdMonth) {
+            list.add(Schedule.OPD(new Time(date, opdPeriod), this));
+            date = date.plusWeeks(1);
+        }
+        return list;
+    }
+
     public String getName() {
         return this.name;
     }
@@ -69,20 +92,5 @@ public class Person {
 
     public void setRole(Role role) {
         this.role = role;
-    }
-
-    private List<Schedule> generateOPDSchedule(
-            Integer opdYear, Integer opdMonth, DayOfWeek opdDayOfWeek, Time.Period opdPeriod) {
-        List<Schedule> list = new ArrayList<>();
-
-        // Get first DayOfWeek in that month
-        LocalDate baseDate = LocalDate.of(opdYear, opdMonth, 1);
-        LocalDate date = baseDate.with(TemporalAdjusters.firstInMonth(opdDayOfWeek));
-
-        while (date.getMonthValue() == opdMonth) {
-            list.add(Schedule.OPD(new Time(date, opdPeriod), this));
-            date = date.plusWeeks(1);
-        }
-        return list;
     }
 }
