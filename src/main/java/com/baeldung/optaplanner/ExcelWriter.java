@@ -1,18 +1,45 @@
 package com.baeldung.optaplanner;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelWriter {
 
-    private static int[] rowStart = new int[] {0, 2, 4, 6, 8};
+    private static int[] rowStart = new int[] {0, 4, 8, 12, 16};
     private static int[] colStart = new int[] {0, 2, 5, 7, 9};
 
     public static void output(SchedulePlan plan, File excelFile) {
+        try {
+            Workbook workbook = generateWorkbook(plan);
+            OutputStream output = new FileOutputStream(excelFile);
+            workbook.write(output);
+        } catch (FileNotFoundException e) {
+            System.out.println(e.toString());
+            System.exit(-1);
+        } catch (IOException e) {
+            System.out.println(e.toString());
+            System.exit(-1);
+        }
+    }
+
+    public static Workbook generateWorkbook(SchedulePlan plan) {
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet();
+
         Map<LocalDate, List<Schedule>> byDate =
                 plan.getScheduleList().stream()
                         .collect(Collectors.groupingBy(s -> s.getTime().getLocalDate()));
@@ -26,13 +53,14 @@ public class ExcelWriter {
                                             + date.withDayOfMonth(1).getDayOfWeek().getValue()
                                             - 2)
                                     / 7;
-            System.out.printf("Week: %d\n", weekNum);
             int baseRow = rowStart[weekNum - 1];
+            System.out.printf("Week: %d ==> Row: %d\n", weekNum, baseRow);
             int baseCol = colStart[date.getDayOfWeek().getValue() - 1];
-            writeDaySchedule(baseRow + 1, baseCol + 1, date, schedules);
+            writeDaySchedule(baseRow + 1, baseCol + 1, date, schedules, sheet);
             System.out.println();
         }
-        return;
+
+        return workbook;
     }
 
     private static int dateCol = 0;
@@ -48,8 +76,8 @@ public class ExcelWriter {
     private static int noteRow = 3;
 
     private static void writeDaySchedule(
-            int baseRow, int baseCol, LocalDate date, List<Schedule> schedules) {
-        writeHeaders(baseRow, baseCol, date);
+            int baseRow, int baseCol, LocalDate date, List<Schedule> schedules, Sheet sheet) {
+        writeHeaders(baseRow, baseCol, date, sheet);
 
         for (Schedule sched : schedules) {
             Schedule.Type type = sched.getType();
@@ -87,29 +115,52 @@ public class ExcelWriter {
             System.out.printf(
                     "Write %s (%s) at (%d,%d)\n",
                     sched.getAssignee().getName(), sched.getType().name(), col, row);
+            writeCell(sheet, col, row, sched.getAssignee().getName());
         }
         return;
     }
 
-    private static void writeHeaders(int baseRow, int baseCol, LocalDate date) {
+    private static void writeHeaders(int baseRow, int baseCol, LocalDate date, Sheet sheet) {
         System.out.printf(
                 "Write %d at (%d,%d)\n",
                 date.getDayOfMonth(), baseCol + dateCol, baseRow + dateRow);
+        writeCell(
+                sheet,
+                baseCol + dateCol,
+                baseRow + dateRow,
+                Integer.toString(date.getDayOfMonth()));
 
         System.out.printf(
                 "Write %s at (%d,%d)\n",
                 "Morning", baseCol + morningHeaderCol, baseRow + morningHeaderRow);
+        writeCell(sheet, baseCol + morningHeaderCol, baseRow + morningHeaderRow, "晨會");
         System.out.printf(
                 "Write %s at (%d,%d)\n", "PAP", baseCol + papHeaderCol, baseRow + papHeaderRow);
+        writeCell(sheet, baseCol + papHeaderCol, baseRow + papHeaderRow, "抹片");
 
         if (date.getDayOfWeek() == DayOfWeek.TUESDAY) {
             System.out.printf(
                     "Write %s at (%d,%d)\n",
                     "Jingfu", baseCol + extraHeaderCol, baseRow + extraHeaderRow);
+            writeCell(sheet, baseCol + extraHeaderCol, baseRow + extraHeaderRow, "景福");
         } else if (date.getDayOfWeek() == DayOfWeek.FRIDAY) {
             System.out.printf(
                     "Write %s at (%d,%d)\n",
                     "W5Meeting", baseCol + extraHeaderCol, baseRow + extraHeaderRow);
+            writeCell(sheet, baseCol + extraHeaderCol, baseRow + extraHeaderRow, "科會");
         }
+    }
+
+    private static void writeCell(Sheet sheet, int colNum, int rowNum, String content) {
+        Row row = sheet.getRow(rowNum);
+        if (row == null) {
+            row = sheet.createRow(rowNum);
+        }
+        Cell cell = row.getCell(colNum, MissingCellPolicy.CREATE_NULL_AS_BLANK);
+        if (cell == null) {
+            cell = row.createCell(colNum);
+        }
+
+        cell.setCellValue(content);
     }
 }
