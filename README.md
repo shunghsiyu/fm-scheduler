@@ -8,6 +8,10 @@ Create single jar for distribution
 
     mvn clean compile assembly:single
 
+Run Main
+
+    mvn exec:java -Dexec.mainClass="com.baeldung.optaplanner.Main"
+
 # Relevant articles
 
 - [A Guide to OptaPlanner](https://www.baeldung.com/opta-planner)
