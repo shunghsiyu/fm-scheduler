@@ -18,6 +18,10 @@ public class Time implements Comparable<Time> {
         public Period next() {
             return vals[(this.ordinal() + 1) % vals.length];
         }
+
+        public int getValue() {
+            return this.ordinal();
+        }
     }
 
     private LocalDate date;

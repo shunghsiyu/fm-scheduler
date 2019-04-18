@@ -12,9 +12,9 @@ import org.optaplanner.core.api.domain.variable.PlanningVariable;
 public class Schedule implements Comparable<Schedule> {
 
     public enum Type {
-        PAP,
         MORNINGMEETING_SLIDE,
         MORNINGMEETING_NOTE,
+        PAP,
         JINGFUMEETING,
         W5MEETING_SLIDE,
         W5MEETING_NOTE,
