@@ -47,12 +47,7 @@ public class ExcelWriter {
             LocalDate date = entry.getKey();
             List<Schedule> schedules = entry.getValue();
             System.out.println(date.toString());
-            int weekNum =
-                    1
-                            + (date.getDayOfMonth()
-                                            + date.withDayOfMonth(1).getDayOfWeek().getValue()
-                                            - 2)
-                                    / 7;
+            int weekNum = getWeekNum(date);
             int baseRow = rowStart[weekNum - 1];
             System.out.printf("Week: %d ==> Row: %d\n", weekNum, baseRow);
             int baseCol = colStart[date.getDayOfWeek().getValue() - 1];
@@ -61,6 +56,12 @@ public class ExcelWriter {
         }
 
         return workbook;
+    }
+
+    private static int getWeekNum(LocalDate date) {
+        int dayOfMonth = date.getDayOfMonth();
+        int extraDays = date.withDayOfMonth(1).getDayOfWeek().getValue() - 1;
+        return 1 + (dayOfMonth + extraDays - 1) / 7;
     }
 
     private static int dateCol = 0;
