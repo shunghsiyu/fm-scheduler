@@ -1,10 +1,16 @@
 package com.baeldung.optaplanner
 
 import com.baeldung.optaplanner.Person;
+import com.baeldung.optaplanner.Person.Role;
 import com.baeldung.optaplanner.Schedule;
+import com.baeldung.optaplanner.Schedule.Type;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
 
 global HardSoftScoreHolder scoreHolder;
+
+function int pow2(int value) {
+    return value * value;
+}
 
 // "每一個排班必須在一個的時間進行" 跟 "每一個排班必須有一個項目" 已經內建
 
@@ -19,21 +25,63 @@ end
 
 // "每一個項目在同一個時間必須不超過一個的在進行" 已經內建
 
-rule "每一個人力在同一個時間必須不被分配超過一個排班"
+rule "每一個人力在同一個時間必須不被分配超過一個排班 - 其他"
     when
         Schedule($assignee : assignee, $time : time, $type : type, assignee != null)
-        Schedule(assignee == $assignee, time == $time, type != type)
+        Schedule(assignee == $assignee, time == $time, type != $type)
     then
         scoreHolder.addHardConstraintMatch(kcontext, -1);
 end
 
-rule "Same number of schedules"
+rule "每一個人力在同一個時間必須不被分配超過一個排班 - 門診"
     when
-        $person : Person()
+        $assignee : Person()
+        $sched : Schedule(assignee == $assignee)
+        Schedule(time == $sched.time) from $assignee.getOPDSchedule()
+    then
+        scoreHolder.addHardConstraintMatch(kcontext, -1);
+end
+
+rule "每一個一般R人力儘量一個月內有 3 次排班的項目是抹片"
+    when
+        $person : Person(role == Role.NORMAL)
         accumulate(
-            $assignment : Schedule(assignee == $person),
+            $assignment : Schedule(assignee == $person, type == Type.PAP),
             $total : count($assignment)
         )
     then
-        scoreHolder.addSoftConstraintMatch(kcontext, -($total.intValue() * $total.intValue()));
+        scoreHolder.addSoftConstraintMatch(kcontext, -pow2($total.intValue() - 3));
+end
+
+rule "每一個人力儘量一個月內有 3 次排班的項目是晨會投影片或科會投影片"
+    when
+        $person : Person()
+        accumulate(
+            $assignment : Schedule(assignee == $person, type == Type.MORNINGMEETING_SLIDE || type == Type.W5MEETING_SLIDE),
+            $total : count($assignment)
+        )
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext, -pow2($total.intValue() - 3));
+end
+
+rule "每一個人力儘量一個月內有 3 次排班的項目是晨會記錄或科會記錄"
+    when
+        $person : Person()
+        accumulate(
+            $assignment : Schedule(assignee == $person, type == Type.MORNINGMEETING_NOTE || type == Type.W5MEETING_NOTE),
+            $total : count($assignment)
+        )
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext, -pow2($total.intValue() - 3));
+end
+
+rule "每一個人力儘量一個月內有 1 次排班的項目是景福講座"
+    when
+        $person : Person()
+        accumulate(
+            $assignment : Schedule(assignee == $person, type == Type.JINGFUMEETING),
+            $total : count($assignment)
+        )
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext, -pow2($total.intValue() - 3));
 end
