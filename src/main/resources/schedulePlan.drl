@@ -27,8 +27,8 @@ end
 
 rule "每一個人力在同一個時間必須不被分配超過一個排班 - 其他"
     when
-        Schedule($assignee : assignee, $time : time, $type : type, assignee != null)
-        Schedule(assignee == $assignee, time == $time, type != $type)
+        Schedule($assignee : assignee, $time : time, $type : type, $id : id, assignee != null)
+        Schedule(assignee == $assignee, time == $time, id != $id)
     then
         scoreHolder.addHardConstraintMatch(kcontext, -1);
 end
