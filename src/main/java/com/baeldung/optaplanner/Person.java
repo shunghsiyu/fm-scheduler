@@ -25,16 +25,19 @@ public class Person {
     private String name;
     @EqualsAndHashCode.Exclude private Gender gender;
     @EqualsAndHashCode.Exclude private Role role;
-    @ToString.Exclude @EqualsAndHashCode.Exclude private List<Schedule> opdSchedules;
+    @ToString.Exclude @EqualsAndHashCode.Exclude private List<Schedule> schedules;
 
-    public Person(String name, Gender gender, List<Schedule> opdSchedules) {
-        this(name, gender, opdSchedules, Role.NORMAL);
+    public Person(String name, Gender gender, List<Schedule> schedules) {
+        this(name, gender, schedules, Role.NORMAL);
     }
 
-    public Person(String name, Gender gender, List<Schedule> opdSchedules, Role role) {
+    public Person(String name, Gender gender, List<Schedule> schedules, Role role) {
+        if (schedules == null) {
+            throw new IllegalArgumentException("schedules cannot be null");
+        }
         this.name = name;
         this.gender = gender;
-        this.opdSchedules = opdSchedules;
+        this.schedules = schedules;
         this.role = role;
     }
 
@@ -45,10 +48,15 @@ public class Person {
             Integer opdMonth,
             DayOfWeek opdDayOfWeek,
             Time.Period opdPeriod) {
-        Person person = new Person(name, gender, null);
-        person.opdSchedules =
+        Person person = new Person(name, gender, new ArrayList<>());
+        person.schedules =
                 person.generateOPDSchedule(opdYear, opdMonth, opdDayOfWeek, opdPeriod, null);
         return person;
+    }
+
+    public Person addSchedule(Schedule sched) {
+        this.schedules.add(sched);
+        return this;
     }
 
     public Person addOPDSchedule(
@@ -65,7 +73,7 @@ public class Person {
         List<Schedule> additionalSchedules =
                 this.generateOPDSchedule(
                         opdYear, opdMonth, opdDayOfWeek, opdPeriod, weekNumMod2Remainder);
-        this.opdSchedules.addAll(additionalSchedules);
+        this.schedules.addAll(additionalSchedules);
         return this;
     }
 
@@ -100,8 +108,8 @@ public class Person {
         return this.gender;
     }
 
-    public List<Schedule> getOPDSchedule() {
-        return this.opdSchedules;
+    public List<Schedule> getSchedules() {
+        return this.schedules;
     }
 
     public Role getRole() {

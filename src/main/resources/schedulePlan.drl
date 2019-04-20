@@ -38,7 +38,7 @@ rule "每一個人力在同一個時間必須不被分配超過一個排班 - �
     when
         $assignee : Person()
         $sched : Schedule(assignee == $assignee)
-        Schedule(time == $sched.time) from $assignee.getOPDSchedule()
+        Schedule(time == $sched.time) from $assignee.getSchedules()
     then
         scoreHolder.addHardConstraintMatch(kcontext, -1);
 end
@@ -100,7 +100,7 @@ rule "每一個人力在同一天儘量不要上午下午都被排班 - 門診"
     when
         $person : Person()
         Schedule($date : time.localDate, $id : id, assignee == $person)
-        Schedule(time.localDate == $date) from $person.getOPDSchedule()
+        Schedule(time.localDate == $date) from $person.getSchedules()
     then
         scoreHolder.addSoftConstraintMatch(kcontext, -20);
 end

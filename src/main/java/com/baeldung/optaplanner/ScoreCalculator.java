@@ -30,7 +30,7 @@ public class ScoreCalculator implements EasyScoreCalculator<SchedulePlan> {
         Set<PersonAtTime> occupancy = new HashSet<>();
 
         for (Person person : plan.getPersonList()) {
-            for (Schedule sched : person.getOPDSchedule()) {
+            for (Schedule sched : person.getSchedules()) {
                 Time time = sched.getTime();
                 PersonAtTime occupied = new PersonAtTime(person, time);
                 occupancy.add(occupied);
