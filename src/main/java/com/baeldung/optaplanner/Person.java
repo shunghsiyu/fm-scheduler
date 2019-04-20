@@ -55,6 +55,7 @@ public class Person {
     }
 
     public Person addSchedule(Schedule sched) {
+        sched.setAssignee(this);
         this.schedules.add(sched);
         return this;
     }
