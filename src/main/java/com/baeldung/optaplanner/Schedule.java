@@ -124,4 +124,8 @@ public class Schedule implements Comparable<Schedule> {
             return compareTime;
         }
     }
+
+    public int getId() {
+        return System.identityHashCode(this);
+    }
 }

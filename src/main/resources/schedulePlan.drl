@@ -25,10 +25,10 @@ end
 
 // "每一個項目在同一個時間必須不超過一個的在進行" 已經內建
 
-rule "每一個人力在同一個時間必須不被分配超過一個排班 - 其他"
+rule "每一個人力在同一個時間必須不被分配超過一個排班"
     when
         Schedule($assignee : assignee, $time : time, $type : type, $id : id, assignee != null)
-        Schedule(assignee == $assignee, time == $time, id != $id)
+        Schedule(assignee == $assignee, time == $time, id > $id)
     then
         scoreHolder.addHardConstraintMatch(kcontext, -1);
 end
@@ -83,5 +83,23 @@ rule "每一個人力儘量一個月內有 1 次排班的項目是景福講座"
             $total : count($assignment)
         )
     then
-        scoreHolder.addSoftConstraintMatch(kcontext, -pow2($total.intValue() - 3));
+        scoreHolder.addSoftConstraintMatch(kcontext, -pow2($total.intValue() - 1));
+end
+
+rule "每一個人力在同一天儘量不要上午下午都被排班"
+    when
+        $person : Person()
+        Schedule($date : time.localDate, $id : id, assignee == $person)
+        Schedule(time.localDate == $date, assignee == $person, id > $id)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext, -100);
+end
+
+rule "每一個人力在同一天儘量不要上午下午都被排班 - 門診"
+    when
+        $person : Person()
+        Schedule($date : time.localDate, $id : id, assignee == $person)
+        Schedule(time.localDate == $date) from $person.getOPDSchedule()
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext, -20);
 end
