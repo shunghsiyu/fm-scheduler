@@ -10,7 +10,7 @@ Create single jar for distribution
 
 Run Main
 
-    mvn exec:java -Dexec.mainClass="com.baeldung.optaplanner.Main"
+    mvn exec:java -Dexec.cleanupDaemonThreads=false -Dexec.mainClass="com.baeldung.optaplanner.Main"
 
 # Relevant articles
 
