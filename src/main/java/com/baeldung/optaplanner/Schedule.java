@@ -18,7 +18,8 @@ public class Schedule implements Comparable<Schedule> {
         JINGFUMEETING,
         W5MEETING_SLIDE,
         W5MEETING_NOTE,
-        OPD
+        OPD,
+        OTHER
     }
 
     private Type type;
@@ -96,6 +97,10 @@ public class Schedule implements Comparable<Schedule> {
         }
 
         return new Schedule(Type.OPD, time, assignee);
+    }
+
+    public static Schedule Other(Time time) {
+        return new Schedule(Type.OTHER, time, null);
     }
 
     public Type getType() {
