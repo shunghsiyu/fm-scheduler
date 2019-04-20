@@ -47,29 +47,47 @@ public class Person {
             Time.Period opdPeriod) {
         Person person = new Person(name, gender, null);
         person.opdSchedules =
-                person.generateOPDSchedule(opdYear, opdMonth, opdDayOfWeek, opdPeriod);
+                person.generateOPDSchedule(opdYear, opdMonth, opdDayOfWeek, opdPeriod, null);
         return person;
     }
 
     public Person addOPDSchedule(
             Integer opdYear, Integer opdMonth, DayOfWeek opdDayOfWeek, Time.Period opdPeriod) {
+        return this.addOPDSchedule(opdYear, opdMonth, opdDayOfWeek, opdPeriod, null);
+    }
+
+    public Person addOPDSchedule(
+            Integer opdYear,
+            Integer opdMonth,
+            DayOfWeek opdDayOfWeek,
+            Time.Period opdPeriod,
+            Integer weekNumMod2Remainder) {
         List<Schedule> additionalSchedules =
-                this.generateOPDSchedule(opdYear, opdMonth, opdDayOfWeek, opdPeriod);
+                this.generateOPDSchedule(
+                        opdYear, opdMonth, opdDayOfWeek, opdPeriod, weekNumMod2Remainder);
         this.opdSchedules.addAll(additionalSchedules);
         return this;
     }
 
     private List<Schedule> generateOPDSchedule(
-            Integer opdYear, Integer opdMonth, DayOfWeek opdDayOfWeek, Time.Period opdPeriod) {
+            Integer opdYear,
+            Integer opdMonth,
+            DayOfWeek opdDayOfWeek,
+            Time.Period opdPeriod,
+            Integer weekNumMod2Remainder) {
         List<Schedule> list = new ArrayList<>();
 
         // Get first DayOfWeek in that month
         LocalDate baseDate = LocalDate.of(opdYear, opdMonth, 1);
-        LocalDate date = baseDate.with(TemporalAdjusters.firstInMonth(opdDayOfWeek));
 
-        while (date.getMonthValue() == opdMonth) {
+        for (LocalDate date = baseDate.with(TemporalAdjusters.firstInMonth(opdDayOfWeek));
+                date.getMonthValue() == opdMonth;
+                date = date.plusWeeks(1)) {
+            Integer simpleWeekNum = 1 + (date.getDayOfMonth() - 1) / 7;
+            if (weekNumMod2Remainder != null && (simpleWeekNum % 2) != weekNumMod2Remainder) {
+                continue;
+            }
             list.add(Schedule.OPD(new Time(date, opdPeriod), this));
-            date = date.plusWeeks(1);
         }
         return list;
     }
