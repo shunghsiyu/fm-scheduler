@@ -1,6 +1,7 @@
 package com.baeldung.optaplanner
 
 import com.baeldung.optaplanner.Person;
+import com.baeldung.optaplanner.Person.Gender;
 import com.baeldung.optaplanner.Person.Role;
 import com.baeldung.optaplanner.Schedule;
 import com.baeldung.optaplanner.Schedule.Type;
@@ -102,4 +103,12 @@ rule "每一個人力在同一天儘量不要上午下午都被排班 - 門診"
         Schedule(time.localDate == $date) from $person.getOPDSchedule()
     then
         scoreHolder.addSoftConstraintMatch(kcontext, -20);
+end
+
+rule "同一天內項目爲抹片的排班希望至少有一個人力是女生"
+    when
+        Schedule($date : time.localDate, $id : id, type == Type.PAP, assignee!.gender == Gender.MALE)
+        Schedule(time.localDate == $date, type == Type.PAP, assignee!.gender == Gender.MALE, id > $id)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext, -1);
 end
