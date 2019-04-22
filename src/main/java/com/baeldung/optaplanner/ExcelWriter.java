@@ -19,6 +19,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelWriter {
 
+    private static int[] weeks = new int[] {1, 2, 3, 4, 5};
     private static int[] rowStart = new int[] {0, 4, 8, 12, 16};
     private static int[] colStart = new int[] {0, 2, 5, 7, 9};
 
@@ -40,6 +41,11 @@ public class ExcelWriter {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet();
 
+        int startRow = 1;
+        int startCol = 1;
+
+        writeSheetHeaders(startRow, 0, sheet);
+
         Map<LocalDate, List<Schedule>> byDate =
                 plan.getScheduleList().stream()
                         .collect(Collectors.groupingBy(s -> s.getTime().getLocalDate()));
@@ -51,7 +57,7 @@ public class ExcelWriter {
             int baseRow = rowStart[weekNum - 1];
             System.out.printf("Week: %d ==> Row: %d\n", weekNum, baseRow);
             int baseCol = colStart[date.getDayOfWeek().getValue() - 1];
-            writeDaySchedule(baseRow + 1, baseCol + 1, date, schedules, sheet);
+            writeDaySchedule(baseRow + startRow, baseCol + startCol, date, schedules, sheet);
             System.out.println();
         }
 
@@ -75,6 +81,16 @@ public class ExcelWriter {
     private static int papBaseRow = 2;
     private static int slideRow = 2;
     private static int noteRow = 3;
+
+    private static void writeSheetHeaders(int baseRow, int baseCol, Sheet sheet) {
+        for (int weekNum : weeks) {
+            int row = baseRow + rowStart[weekNum - 1];
+            int col = baseCol;
+            writeCell(sheet, col, row + slideRow, "上午／投影片");
+            writeCell(sheet, col, row + noteRow, "下午／記錄");
+            System.out.printf("Header weekNum: %d, col: %d, row: %d\n", weekNum, col, row);
+        }
+    }
 
     private static void writeDaySchedule(
             int baseRow, int baseCol, LocalDate date, List<Schedule> schedules, Sheet sheet) {
