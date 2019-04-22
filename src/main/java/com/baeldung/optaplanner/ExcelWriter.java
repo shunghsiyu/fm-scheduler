@@ -1,5 +1,6 @@
 package com.baeldung.optaplanner;
 
+import com.baeldung.optaplanner.Schedule.Type;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -57,8 +58,26 @@ public class ExcelWriter {
             int baseRow = rowStart[weekNum - 1];
             System.out.printf("Week: %d ==> Row: %d\n", weekNum, baseRow);
             int baseCol = colStart[date.getDayOfWeek().getValue() - 1];
-            writeDaySchedule(baseRow + startRow, baseCol + startCol, date, schedules, sheet);
+            writeDaySchedule(startRow + baseRow, startCol + baseCol, date, schedules, sheet);
             System.out.println();
+        }
+
+        startRow = startRow + rowStart[rowStart.length - 1] + noteRow + 4;
+        writeAnalyticHeaders(startRow, sheet);
+        startRow += 1;
+
+        Map<Person, List<Schedule>> byPerson =
+                plan.getScheduleList().stream()
+                        .collect(Collectors.groupingBy(s -> s.getAssignee()));
+        for (Map.Entry<Person, List<Schedule>> entry : byPerson.entrySet()) {
+            Person person = entry.getKey();
+            List<Schedule> schedules = entry.getValue();
+            System.out.println(person.getName());
+            System.out.println(startRow);
+            System.out.println(schedules.toString());
+            writeAnalytic(startRow, person, schedules, sheet);
+            System.out.println();
+            startRow += 1;
         }
 
         return workbook;
@@ -166,6 +185,71 @@ public class ExcelWriter {
                     "W5Meeting", baseCol + extraHeaderCol, baseRow + extraHeaderRow);
             writeCell(sheet, baseCol + extraHeaderCol, baseRow + extraHeaderRow, "科會");
         }
+    }
+
+    private static int analyticNameCol = 0;
+    private static int analyticPAPCol = 1;
+    private static int analyticMorningNoteCol = 2;
+    private static int analyticW5NoteCol = 3;
+    private static int analyticMorningSlideCol = 4;
+    private static int analyticW5SlideCol = 5;
+    private static int analyticJingfuCol = 6;
+
+    private static void writeAnalyticHeaders(int row, Sheet sheet) {
+        writeAnalytic(sheet, row, Type.PAP, "抹片");
+        writeAnalytic(sheet, row, Type.MORNINGMEETING_NOTE, "晨會記錄");
+        writeAnalytic(sheet, row, Type.W5MEETING_NOTE, "科會記錄");
+        writeAnalytic(sheet, row, Type.MORNINGMEETING_SLIDE, "晨會投影片");
+        writeAnalytic(sheet, row, Type.W5MEETING_SLIDE, "科會投影片");
+        writeAnalytic(sheet, row, Type.JINGFUMEETING, "景福");
+    }
+
+    private static void writeAnalytic(
+            int row, Person person, List<Schedule> schedules, Sheet sheet) {
+        writeCell(sheet, analyticNameCol, row, person.getName());
+        writeAnalytic(sheet, row, Type.PAP, "0");
+        writeAnalytic(sheet, row, Type.MORNINGMEETING_NOTE, "0");
+        writeAnalytic(sheet, row, Type.W5MEETING_NOTE, "0");
+        writeAnalytic(sheet, row, Type.MORNINGMEETING_SLIDE, "0");
+        writeAnalytic(sheet, row, Type.W5MEETING_SLIDE, "0");
+        writeAnalytic(sheet, row, Type.JINGFUMEETING, "0");
+
+        Map<Type, Long> countByType =
+                schedules.stream()
+                        .collect(Collectors.groupingBy(Schedule::getType, Collectors.counting()));
+        for (Map.Entry<Type, Long> entry : countByType.entrySet()) {
+            Type type = entry.getKey();
+            Long count = entry.getValue();
+            System.out.printf("    %s: %d\n", type.name(), count);
+            writeAnalytic(sheet, row, type, count.toString());
+        }
+    }
+
+    private static void writeAnalytic(Sheet sheet, int row, Type type, String value) {
+        int col = -1;
+        switch (type) {
+            case PAP:
+                col = analyticPAPCol;
+                break;
+            case MORNINGMEETING_SLIDE:
+                col = analyticMorningSlideCol;
+                break;
+            case MORNINGMEETING_NOTE:
+                col = analyticMorningNoteCol;
+                break;
+            case JINGFUMEETING:
+                col = analyticJingfuCol;
+                break;
+            case W5MEETING_SLIDE:
+                col = analyticW5SlideCol;
+                break;
+            case W5MEETING_NOTE:
+                col = analyticW5NoteCol;
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+        writeCell(sheet, col, row, value);
     }
 
     private static void writeCell(Sheet sheet, int colNum, int rowNum, String content) {
