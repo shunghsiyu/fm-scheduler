@@ -1,5 +1,5 @@
 import {DateTime} from 'luxon'
-import Time from './Time';
+import {daysInMonth, workingDays} from './Time';
 
 expect.extend({
     toDateTimeEqual(received: DateTime, actual: DateTime) {
@@ -77,7 +77,7 @@ describe('daysInMonth', () => {
             DateTime.fromISO('2019-05-30'),
             DateTime.fromISO('2019-05-31')
         ];
-        expect(Time.daysInMonth(2019, 5)).toEqual(days);
+        expect(daysInMonth(2019, 5)).toEqual(days);
     });
 });
 
@@ -108,6 +108,6 @@ describe('workingDays', () => {
             DateTime.fromISO('2019-05-30'),
             DateTime.fromISO('2019-05-31')
         ];
-        expect(Time.workingDays(2019, 5)).sameDaysAs(days);
+        expect(workingDays(2019, 5)).sameDaysAs(days);
     })
 });
