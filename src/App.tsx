@@ -1,26 +1,29 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import './Time';
+import { Container, Header, List, Card, Icon } from 'semantic-ui-react'
+import 'semantic-ui-css/semantic.min.css'
+import Person, { Gender } from './Person'
+
+const PersonCard: React.FC<{ person: Person }> = props => {
+  return (
+    <Card>
+      <Card.Content>
+        <Card.Header>{ props.person.name }</Card.Header>
+        <Card.Meta>小 CR</Card.Meta>
+      </Card.Content>
+    </Card>
+  );
+};
+
+const person: Person = new Person('王小明', Gender.Male);
 
 const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container style={{ margin: 20 }}>
+      <Header as="h3">編輯排班</Header>
+      <Container>
+        <PersonCard person={ person } />
+      </Container>
+    </Container>
   );
 };
 

@@ -1,9 +1,9 @@
-enum Gender {
+export enum Gender {
     Male,
     Female
 }
 
-class Person {
+export default class Person {
     name: string;
     gender: Gender;
 
@@ -12,5 +12,3 @@ class Person {
         this.gender = gender;
     }
 }
-
-export default Person;
