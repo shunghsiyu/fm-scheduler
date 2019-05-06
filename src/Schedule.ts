@@ -2,14 +2,14 @@ import Time from "./Time";
 import Person from "./Person";
 
 export enum Type {
-    MORNINGMEETING_SLIDE,
-    MORNINGMEETING_NOTE,
-    PAP,
-    JINGFUMEETING,
-    W5MEETING_SLIDE,
-    W5MEETING_NOTE,
-    OPD,
-    OTHER
+    MorningSlide = "晨會投影片",
+    MorningNote = "晨會記錄",
+    PAP = "抹片",
+    Jingfu = "景福",
+    W5Slide = "科會投影片",
+    W5Note = "科會記錄",
+    OPD = "門診",
+    Other = "其他"
 }
 
 export default class Schedule {

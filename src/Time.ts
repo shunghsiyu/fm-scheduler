@@ -1,4 +1,4 @@
-import {DateTime, Duration} from 'luxon'
+import { DateTime, Duration } from 'luxon'
 
 const oneDay = Duration.fromObject({days: 1});
 const oneMonth = Duration.fromObject({month: 1});
@@ -19,8 +19,8 @@ export function workingDays(year: number, month: number): Array<DateTime> {
 }
 
 export enum Period {
-    Morning,
-    Afternoon
+    Morning = "早上",
+    Afternoon = "下午"
 }
 
 export default class Time {
@@ -28,7 +28,13 @@ export default class Time {
     period: Period;
 
     constructor(date: DateTime, period: Period) {
-        this.date = date;
+        this.date = date.setLocale('zh-TW');
         this.period = period;
+    }
+
+    dateStr(): string {
+        const date = this.date;
+        const dayOfWeek = date.weekdayShort.slice(1);
+        return `${ date.month }/${ date.day } (${ dayOfWeek })`;
     }
 };
