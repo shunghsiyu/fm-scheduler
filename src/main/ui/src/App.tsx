@@ -1,7 +1,19 @@
 import React, { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useState } from 'react';
-import { Card, Container, DropdownProps, Form, Header, InputOnChangeData } from 'semantic-ui-react'
+import {
+    Card,
+    Container,
+    DropdownProps,
+    Form,
+    Grid,
+    Header,
+    InputOnChangeData,
+    Table
+} from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css'
+import { DateTime } from "luxon"
 import Person, { Gender, Role } from './Person'
+import Schedule, { Type } from "./Schedule"
+import Time, { Period } from "./Time"
 
 const PersonDisplay: React.FC<{ person: Person }> = props => {
     return (
@@ -61,7 +73,56 @@ const PersonEdit: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = pro
     );
 };
 
+const ScheduleDisplay: React.FC = () => {
+    const tableRows = schedules.map((schedule, idx) => {
+        const { type, time } = schedule;
+        return (
+            <Table.Row key={ idx }>
+                <Table.Cell>{ time.dateStr() }
+                    <small> { time.period }</small>
+                </Table.Cell>
+                <Table.Cell>{ type }</Table.Cell>
+            </Table.Row>
+        );
+    });
+    return (
+        <Table singleLine>
+            <Table.Header>
+                <Table.Row>
+                    <Table.HeaderCell>時間</Table.HeaderCell>
+                    <Table.HeaderCell>工作</Table.HeaderCell>
+                </Table.Row>
+            </Table.Header>
+            <Table.Body>
+                { tableRows }
+            </Table.Body>
+        </Table>
+    )
+};
+
 const defaultPerson: Person = new Person('王小明', Role.AssistantChiefResident, Gender.Male);
+const schedules: Array<Schedule> = [
+    new Schedule(
+        Type.PAP,
+        new Time(DateTime.local(2019, 5, 1), Period.Morning),
+        defaultPerson
+    ),
+    new Schedule(
+        Type.PAP,
+        new Time(DateTime.local(2019, 5, 1), Period.Afternoon),
+        defaultPerson
+    ),
+    new Schedule(
+        Type.MorningNote,
+        new Time(DateTime.local(2019, 5, 2), Period.Morning),
+        defaultPerson
+    ),
+    new Schedule(
+        Type.W5Slide,
+        new Time(DateTime.local(2019, 5, 3), Period.Afternoon),
+        defaultPerson
+    ),
+];
 
 const App: React.FC = () => {
     const [person, setPerson] = useState<Person>(defaultPerson);
@@ -69,10 +130,15 @@ const App: React.FC = () => {
     return (
         <Container style={ { margin: 20 } }>
             <Header as="h3">編輯排班</Header>
-            <Container>
-                <PersonDisplay person={ person }/>
-                <PersonEdit onSubmit={ setPerson }/>
-            </Container>
+            <Grid columns={ 2 }>
+                <Grid.Column>
+                    <PersonDisplay person={ person }/>
+                    <PersonEdit onSubmit={ setPerson }/>
+                </Grid.Column>
+                <Grid.Column>
+                    <ScheduleDisplay/>
+                </Grid.Column>
+            </Grid>
         </Container>
     );
 };
