@@ -7,7 +7,9 @@ const PersonDisplay: React.FC<{ person: Person }> = props => {
     return (
         <Card>
             <Card.Content>
-                <Card.Header>{ props.person.name }</Card.Header>
+                <Card.Header>{ props.person.name }
+                    <small style={ { padding: '0.5em' } }>({ props.person.gender })</small>
+                </Card.Header>
                 <Card.Meta>{ props.person.role }</Card.Meta>
             </Card.Content>
         </Card>
@@ -46,10 +48,11 @@ const PersonEdit: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = pro
             </Card.Content>
             <Card.Content>
                 <Form>
-                    <Form.Input label="姓名" placeholder="請輸入姓名" value={ name } onChange={ setName }/>
-                    <Form.Select label="性別" placeholder="請選擇性別" options={ genderOptions }
+                    <Form.Input label="姓名" placeholder="請輸入姓名" required value={ name }
+                                onChange={ setName }/>
+                    <Form.Select label="性別" placeholder="請選擇性別" required options={ genderOptions }
                                  onChange={ setGender }/>
-                    <Form.Select label="身份" placeholder="請選擇身份" options={ roleOptions }
+                    <Form.Select label="身份" placeholder="請選擇身份" required options={ roleOptions }
                                  onChange={ setRole }/>
                     <Form.Button positive onClick={ addPerson }>新增</Form.Button>
                 </Form>
