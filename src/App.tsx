@@ -47,14 +47,14 @@ const PersonEdit: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = pro
                 <Card.Header>新增人員</Card.Header>
             </Card.Content>
             <Card.Content>
-                <Form>
+                <Form onSubmit={ addPerson }>
                     <Form.Input label="姓名" placeholder="請輸入姓名" required value={ name }
                                 onChange={ setName }/>
                     <Form.Select label="性別" placeholder="請選擇性別" required options={ genderOptions }
                                  onChange={ setGender }/>
                     <Form.Select label="身份" placeholder="請選擇身份" required options={ roleOptions }
                                  onChange={ setRole }/>
-                    <Form.Button positive onClick={ addPerson }>新增</Form.Button>
+                    <Form.Button positive>新增</Form.Button>
                 </Form>
             </Card.Content>
         </Card>
