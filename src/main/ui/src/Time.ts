@@ -1,14 +1,14 @@
 import { DateTime, Duration } from 'luxon'
 
-const oneDay = Duration.fromObject({days: 1});
-const oneMonth = Duration.fromObject({month: 1});
+const oneDay = Duration.fromObject({ days: 1 });
+const oneMonth = Duration.fromObject({ month: 1 });
 
 export function daysInMonth(year: number, month: number): Array<DateTime> {
-    const firstDayOfMonth = DateTime.fromObject({year, month});
+    const firstDayOfMonth = DateTime.fromObject({ year, month });
     const firstDayOfNextMonth = firstDayOfMonth.plus(oneMonth);
     const arr = [];
-    for (let day: DateTime = firstDayOfMonth; day < firstDayOfNextMonth; day = day.plus(oneDay)) {
-        arr.push(day)
+    for (let dateTime: DateTime = firstDayOfMonth; dateTime < firstDayOfNextMonth; dateTime = dateTime.plus(oneDay)) {
+        arr.push(dateTime)
     }
     return arr;
 }
@@ -16,6 +16,11 @@ export function daysInMonth(year: number, month: number): Array<DateTime> {
 export function workingDays(year: number, month: number): Array<DateTime> {
     const days = daysInMonth(year, month);
     return days.filter(day => 1 <= day.weekday && day.weekday <= 5)
+}
+
+export function workingWeekDays(year: number, month: number, weekday: number): Array<DateTime> {
+    const days = workingDays(year, month);
+    return days.filter(day => day.weekday === weekday)
 }
 
 export enum Period {
@@ -32,9 +37,70 @@ export default class Time {
         this.period = period;
     }
 
+    oddWeek(): boolean {
+        const dayInMonth = this.date.day;
+        const weekNum = Math.floor(dayInMonth / 7) + 1;
+        return (weekNum % 2) === 1;
+    }
+
+    evenWeek(): boolean {
+        return !this.oddWeek();
+    }
+
     dateStr(): string {
         const date = this.date;
         const dayOfWeek = date.weekdayShort.slice(1);
         return `${ date.month }/${ date.day } (${ dayOfWeek })`;
     }
 };
+
+export enum RepeatType {
+    At = "特定時間",
+    EvenWeek = "每雙週",
+    OddWeek = "每單週",
+    Week = "每週",
+    Day = "每天",
+    Period = "每個時段",
+}
+
+export type Repeat =
+    { type: RepeatType.At, time: Time } |
+    { type: RepeatType.EvenWeek, weekday: number, period: Period } |
+    { type: RepeatType.OddWeek, weekday: number, period: Period } |
+    { type: RepeatType.Week, weekday: number, period: Period } |
+    { type: RepeatType.Day, period: Period } |
+    { type: RepeatType.Period };
+
+export function getTimes(year: number, month: number, repeat: Repeat): Array<Time> {
+    const arr = [];
+    if (repeat.type === RepeatType.At) {
+        arr.push(repeat.time)
+    } else if (repeat.type === RepeatType.Period) {
+        for (const dateTime of workingDays(year, month)) {
+            for (const period of Object.values(Period)) {
+                const time = new Time(dateTime, period);
+                arr.push(time)
+            }
+        }
+    } else if (repeat.type === RepeatType.Day) {
+        const period = repeat.period;
+        for (const dateTime of workingDays(year, month)) {
+            const time = new Time(dateTime, period);
+            arr.push(time)
+        }
+    } else {
+        const weekday = repeat.weekday;
+        const period = repeat.period;
+        for (const dateTime of workingWeekDays(year, month, weekday)) {
+            const time = new Time(dateTime, period);
+            if (repeat.type === RepeatType.OddWeek && time.oddWeek()) {
+                arr.push(time)
+            } else if (repeat.type === RepeatType.EvenWeek && time.evenWeek()) {
+                arr.push(time)
+            } else if (repeat.type === RepeatType.Week) {
+                arr.push(time)
+            }
+        }
+    }
+    return arr
+}
