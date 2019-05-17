@@ -1,12 +1,5 @@
 import { DateTime } from 'luxon'
-import Time, {
-    daysInMonth,
-    getTimes,
-    Period,
-    RepeatType,
-    workingDays,
-    workingWeekDays
-} from './Time';
+import Time, { daysInMonth, getTimes, Period, RepeatType, workingDays, workingWeekDays } from './Time';
 
 expect.extend({
     toDateTimeEqual(received: DateTime, actual: DateTime) {
@@ -135,17 +128,17 @@ describe('workingWeekDays', () => {
 describe('getTimes', () => {
     test('returns the same time wrapped in Array for At repeat type', () => {
         const time = new Time(DateTime.fromISO('2019-05-01'), Period.Morning);
-        expect(getTimes(2019, 5, { type: RepeatType.At, time })).toEqual([time])
+        expect(getTimes(2019, 5, { type: RepeatType.At, date: 1, period: Period.Morning })).toEqual([time])
     });
 
     test('returns specific even weekdays for EvenWeek repeat type', () => {
         const times = [
-            new Time(DateTime.fromISO('2019-05-09'), Period.Afternoon),
-            new Time(DateTime.fromISO('2019-05-23'), Period.Afternoon),
+            new Time(DateTime.fromISO('2019-05-14'), Period.Afternoon),
+            new Time(DateTime.fromISO('2019-05-28'), Period.Afternoon),
         ];
         expect(getTimes(2019, 5, {
             type: RepeatType.EvenWeek,
-            weekday: 4,
+            weekday: 2,
             period: Period.Afternoon
         })).toEqual(times)
     });
@@ -164,14 +157,15 @@ describe('getTimes', () => {
 
     test('returns specific weekdays for Week repeat type', () => {
         const times = [
-            new Time(DateTime.fromISO('2019-05-07'), Period.Morning),
-            new Time(DateTime.fromISO('2019-05-14'), Period.Morning),
-            new Time(DateTime.fromISO('2019-05-21'), Period.Morning),
-            new Time(DateTime.fromISO('2019-05-28'), Period.Morning),
+            new Time(DateTime.fromISO('2019-05-01'), Period.Morning),
+            new Time(DateTime.fromISO('2019-05-08'), Period.Morning),
+            new Time(DateTime.fromISO('2019-05-15'), Period.Morning),
+            new Time(DateTime.fromISO('2019-05-22'), Period.Morning),
+            new Time(DateTime.fromISO('2019-05-29'), Period.Morning),
         ];
         expect(getTimes(2019, 5, {
             type: RepeatType.Week,
-            weekday: 2,
+            weekday: 3,
             period: Period.Morning
         })).toEqual(times)
     });

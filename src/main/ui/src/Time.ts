@@ -39,7 +39,7 @@ export default class Time {
 
     oddWeek(): boolean {
         const dayInMonth = this.date.day;
-        const weekNum = Math.floor(dayInMonth / 7) + 1;
+        const weekNum = Math.floor((dayInMonth - 1) / 7) + 1;
         return (weekNum % 2) === 1;
     }
 
@@ -64,7 +64,7 @@ export enum RepeatType {
 }
 
 export type Repeat =
-    { type: RepeatType.At, time: Time } |
+    { type: RepeatType.At, date: number, period: Period } |
     { type: RepeatType.EvenWeek, weekday: number, period: Period } |
     { type: RepeatType.OddWeek, weekday: number, period: Period } |
     { type: RepeatType.Week, weekday: number, period: Period } |
@@ -74,7 +74,8 @@ export type Repeat =
 export function getTimes(year: number, month: number, repeat: Repeat): Array<Time> {
     const arr = [];
     if (repeat.type === RepeatType.At) {
-        arr.push(repeat.time)
+        const time = new Time(DateTime.local(year, month, repeat.date), repeat.period);
+        arr.push(time)
     } else if (repeat.type === RepeatType.Period) {
         for (const dateTime of workingDays(year, month)) {
             for (const period of Object.values(Period)) {
