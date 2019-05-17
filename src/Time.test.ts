@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import Time, { daysInMonth, getTimes, Period, RepeatType, workingDays, workingWeekDays } from './Time';
+import Time, { daysInMonth, getTimes, Period, RepeatType, WeekDay, workingDays, workingWeekDays } from './Time';
 
 expect.extend({
     toDateTimeEqual(received: DateTime, actual: DateTime) {
@@ -138,7 +138,7 @@ describe('getTimes', () => {
         ];
         expect(getTimes(2019, 5, {
             type: RepeatType.EvenWeek,
-            weekday: 2,
+            weekday: WeekDay.Tuesday,
             period: Period.Afternoon
         })).toEqual(times)
     });
@@ -150,7 +150,7 @@ describe('getTimes', () => {
         ];
         expect(getTimes(2019, 5, {
             type: RepeatType.OddWeek,
-            weekday: 1,
+            weekday: WeekDay.Monday,
             period: Period.Morning
         })).toEqual(times)
     });
@@ -165,7 +165,7 @@ describe('getTimes', () => {
         ];
         expect(getTimes(2019, 5, {
             type: RepeatType.Week,
-            weekday: 3,
+            weekday: WeekDay.Wednesday,
             period: Period.Morning
         })).toEqual(times)
     });
