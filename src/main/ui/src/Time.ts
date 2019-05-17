@@ -63,11 +63,19 @@ export enum RepeatType {
     Period = "每個時段",
 }
 
+export enum WeekDay {
+    Monday = 1,
+    Tuesday = 2,
+    Wednesday = 3,
+    Thursday = 4,
+    Friday = 5,
+}
+
 export type Repeat =
     { type: RepeatType.At, date: number, period: Period } |
-    { type: RepeatType.EvenWeek, weekday: number, period: Period } |
-    { type: RepeatType.OddWeek, weekday: number, period: Period } |
-    { type: RepeatType.Week, weekday: number, period: Period } |
+    { type: RepeatType.EvenWeek, weekday: WeekDay, period: Period } |
+    { type: RepeatType.OddWeek, weekday: WeekDay, period: Period } |
+    { type: RepeatType.Week, weekday: WeekDay, period: Period } |
     { type: RepeatType.Day, period: Period } |
     { type: RepeatType.Period };
 
