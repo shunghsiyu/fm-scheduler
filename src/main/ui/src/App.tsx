@@ -1,19 +1,9 @@
 import React, { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useState } from 'react';
-import {
-    Card,
-    Container,
-    DropdownProps,
-    Form,
-    Grid,
-    Header,
-    InputOnChangeData,
-    Table
-} from 'semantic-ui-react'
+import { Card, Container, DropdownProps, Form, Grid, Header, InputOnChangeData, Table } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css'
-import { DateTime } from "luxon"
 import Person, { Gender, Role } from './Person'
-import Schedule, { Type } from "./Schedule"
-import Time, { Period } from "./Time"
+import { RepeatedSchedule, Type } from "./Schedule"
+import { Period, RepeatType } from "./Time"
 
 const PersonDisplay: React.FC<{ person: Person }> = props => {
     return (
@@ -73,7 +63,8 @@ const PersonEdit: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = pro
     );
 };
 
-const ScheduleDisplay: React.FC = () => {
+const RepeatedScheduleDisplay: React.FC = () => {
+    const schedules = repeatedSchedules.flatMap(repeatedSchedule => repeatedSchedule.toSchedules());
     const tableRows = schedules.map((schedule, idx) => {
         const { type, time } = schedule;
         return (
@@ -101,27 +92,16 @@ const ScheduleDisplay: React.FC = () => {
 };
 
 const defaultPerson: Person = new Person('王小明', Role.AssistantChiefResident, Gender.Male);
-const schedules: Array<Schedule> = [
-    new Schedule(
-        Type.PAP,
-        new Time(DateTime.local(2019, 5, 1), Period.Morning),
-        defaultPerson
-    ),
-    new Schedule(
-        Type.PAP,
-        new Time(DateTime.local(2019, 5, 1), Period.Afternoon),
-        defaultPerson
-    ),
-    new Schedule(
-        Type.MorningNote,
-        new Time(DateTime.local(2019, 5, 2), Period.Morning),
-        defaultPerson
-    ),
-    new Schedule(
-        Type.W5Slide,
-        new Time(DateTime.local(2019, 5, 3), Period.Afternoon),
-        defaultPerson
-    ),
+const repeatedSchedules: Array<RepeatedSchedule> = [
+    new RepeatedSchedule(Type.Jingfu, 2019, 5, { type: RepeatType.At, date: 3, period: Period.Afternoon }),
+    new RepeatedSchedule(Type.OPD, 2019, 5, {
+        type: RepeatType.EvenWeek,
+        weekday: 2,
+        period: Period.Morning
+    }, defaultPerson),
+    new RepeatedSchedule(Type.W5Slide, 2019, 5, { type: RepeatType.Week, weekday: 5, period: Period.Afternoon }),
+    new RepeatedSchedule(Type.Other, 2019, 5, { type: RepeatType.Day, period: Period.Morning }),
+    new RepeatedSchedule(Type.PAP, 2019, 5, { type: RepeatType.Period }),
 ];
 
 const App: React.FC = () => {
@@ -136,7 +116,7 @@ const App: React.FC = () => {
                     <PersonEdit onSubmit={ setPerson }/>
                 </Grid.Column>
                 <Grid.Column>
-                    <ScheduleDisplay/>
+                    <RepeatedScheduleDisplay/>
                 </Grid.Column>
             </Grid>
         </Container>
