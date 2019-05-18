@@ -67,8 +67,8 @@ const PersonEdit: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = pro
     );
 };
 
-const RepeatedScheduleDisplay: React.FC = () => {
-    const schedules = repeatedSchedules.flatMap(repeatedSchedule => repeatedSchedule.toSchedules());
+const RepeatedScheduleDisplay: React.FC<{ repeatedSchedule: RepeatedSchedule }> = ({ repeatedSchedule }) => {
+    const schedules = repeatedSchedule.toSchedules();
     const tableRows = schedules.map((schedule, idx) => {
         const { type, time } = schedule;
         return (
@@ -95,7 +95,10 @@ const RepeatedScheduleDisplay: React.FC = () => {
     )
 };
 
-const RepeatedScheduleEdit: React.FC = () => {
+const RepeatedScheduleEdit: React.FC<{ onSubmit?: Dispatch<SetStateAction<RepeatedSchedule>> }> = ({
+                                                                                                       onSubmit = () => {
+                                                                                                       }
+                                                                                                   }) => {
     const repeatTypeOptions = Object.keys(RepeatType).map(key => {
         return { key: key, text: RepeatType[key as keyof typeof RepeatType], value: key }
     });
@@ -113,8 +116,15 @@ const RepeatedScheduleEdit: React.FC = () => {
     };
     const [repeat, setRepeat] = useState<Repeat>();
 
+    const submitRepeatedSchedule = () => {
+        if (repeat !== undefined && typeKey !== undefined) {
+            const repeatedSchedule = new RepeatedSchedule(Type[typeKey], YEAR, MONTH, repeat);
+            onSubmit(repeatedSchedule)
+        }
+    };
+
     return (
-        <Form>
+        <Form onSubmit={ submitRepeatedSchedule }>
             <Form.Select key="repeatType" label="重複" placeholder="請重複頻率" required options={ repeatTypeOptions }
                          value={ repeatTypeKey }
                          onChange={ setRepeatTypeKeyOnChange }/>
@@ -123,6 +133,7 @@ const RepeatedScheduleEdit: React.FC = () => {
                                         onChange={ r => setRepeat(r) }/>
             <Form.Select key="type" label="工作" placeholder="請選擇工作" required options={ typeOptions } value={ typeKey }
                          onChange={ setTypeKeyOnChange }/>
+            <Form.Button positive>送出</Form.Button>
         </Form>
     );
 };
@@ -234,20 +245,12 @@ const RepeatedScheduleDetailEdit: React.FC<RepeatedScheduleDetailEditProps> = ({
 };
 
 const defaultPerson: Person = new Person('王小明', Role.AssistantChiefResident, Gender.Male);
-const repeatedSchedules: Array<RepeatedSchedule> = [
-    new RepeatedSchedule(Type.Jingfu, 2019, 5, { type: RepeatType.At, date: 3, period: Period.Afternoon }),
-    new RepeatedSchedule(Type.OPD, 2019, 5, {
-        type: RepeatType.EvenWeek,
-        weekday: 2,
-        period: Period.Morning
-    }, defaultPerson),
-    new RepeatedSchedule(Type.W5Slide, 2019, 5, { type: RepeatType.Week, weekday: 5, period: Period.Afternoon }),
-    new RepeatedSchedule(Type.Other, 2019, 5, { type: RepeatType.Day, period: Period.Morning }),
-    new RepeatedSchedule(Type.PAP, 2019, 5, { type: RepeatType.Period }),
-];
+const defaultRepeatedSchedule: RepeatedSchedule =
+    new RepeatedSchedule(Type.W5Slide, 2019, 5, { type: RepeatType.Week, weekday: 5, period: Period.Afternoon });
 
 const App: React.FC = () => {
     const [person, setPerson] = useState<Person>(defaultPerson);
+    const [repeatedSchedule, setRepeatedSchedule] = useState<RepeatedSchedule>(defaultRepeatedSchedule);
 
     return (
         <Container style={ { margin: 20 } }>
@@ -258,8 +261,8 @@ const App: React.FC = () => {
                     <PersonEdit onSubmit={ setPerson }/>
                 </Grid.Column>
                 <Grid.Column>
-                    <RepeatedScheduleEdit/>
-                    <RepeatedScheduleDisplay/>
+                    <RepeatedScheduleEdit onSubmit={ repeatedSchedule => setRepeatedSchedule(repeatedSchedule) }/>
+                    <RepeatedScheduleDisplay repeatedSchedule={ repeatedSchedule }/>
                 </Grid.Column>
             </Grid>
         </Container>
