@@ -71,6 +71,15 @@ export enum WeekDay {
     Friday = 5,
 }
 
+export const weekDayMapping = [
+    undefined,
+    "一",
+    "二",
+    "三",
+    "四",
+    "五",
+];
+
 export type Repeat =
     { type: RepeatType.At, date: number, period: Period } |
     { type: RepeatType.EvenWeek, weekday: WeekDay, period: Period } |
