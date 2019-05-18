@@ -1,13 +1,11 @@
 import React, { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useEffect, useState } from 'react';
-import { Card, Container, DropdownProps, Form, Grid, Header, InputOnChangeData, Table } from 'semantic-ui-react'
+import { Card, Container, DropdownProps, Form, Header, InputOnChangeData, Segment, Table } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css'
 import Person, { Gender, Role } from './Person'
 import { RepeatedSchedule, Type } from "./Schedule"
 import { Period, Repeat, RepeatType, WeekDay, weekDayMapping, workingDays } from "./Time"
 import isEqual from "lodash.isequal"
-
-const YEAR = 2019;
-const MONTH = 5;
+import { DateTime } from "luxon";
 
 const PersonDisplay: React.FC<{ person: Person }> = props => {
     return (
@@ -95,10 +93,12 @@ const RepeatedScheduleDisplay: React.FC<{ repeatedSchedule: RepeatedSchedule }> 
     )
 };
 
-const RepeatedScheduleEdit: React.FC<{ onSubmit?: Dispatch<SetStateAction<RepeatedSchedule>> }> = ({
-                                                                                                       onSubmit = () => {
-                                                                                                       }
-                                                                                                   }) => {
+type RepeatedScheduleEditProps = {
+    year: number,
+    month: number,
+    onSubmit?: Dispatch<SetStateAction<RepeatedSchedule>>
+}
+const RepeatedScheduleEdit: React.FC<RepeatedScheduleEditProps> = ({ year, month, onSubmit = Function.prototype }) => {
     const repeatTypeOptions = Object.keys(RepeatType).map(key => {
         return { key: key, text: RepeatType[key as keyof typeof RepeatType], value: key }
     });
@@ -118,7 +118,7 @@ const RepeatedScheduleEdit: React.FC<{ onSubmit?: Dispatch<SetStateAction<Repeat
 
     const submitRepeatedSchedule = () => {
         if (repeat !== undefined && typeKey !== undefined) {
-            const repeatedSchedule = new RepeatedSchedule(Type[typeKey], YEAR, MONTH, repeat);
+            const repeatedSchedule = new RepeatedSchedule(Type[typeKey], year, month, repeat);
             onSubmit(repeatedSchedule)
         }
     };
@@ -128,7 +128,8 @@ const RepeatedScheduleEdit: React.FC<{ onSubmit?: Dispatch<SetStateAction<Repeat
             <Form.Select key="repeatType" label="重複" placeholder="請重複頻率" required options={ repeatTypeOptions }
                          value={ repeatTypeKey }
                          onChange={ setRepeatTypeKeyOnChange }/>
-            <RepeatedScheduleDetailEdit repeatType={ repeatTypeKey ? RepeatType[repeatTypeKey] : undefined }
+            <RepeatedScheduleDetailEdit year={ year } month={ month }
+                                        repeatType={ repeatTypeKey ? RepeatType[repeatTypeKey] : undefined }
                                         value={ repeat }
                                         onChange={ r => setRepeat(r) }/>
             <Form.Select key="type" label="工作" placeholder="請選擇工作" required options={ typeOptions } value={ typeKey }
@@ -138,133 +139,172 @@ const RepeatedScheduleEdit: React.FC<{ onSubmit?: Dispatch<SetStateAction<Repeat
     );
 };
 
-type RepeatedScheduleDetailEditProps = { repeatType?: RepeatType, value?: Repeat, onChange?: (repeat: Repeat | undefined) => void }
-const RepeatedScheduleDetailEdit: React.FC<RepeatedScheduleDetailEditProps> = ({
-                                                                                   repeatType, value, onChange = () => {
-    }
-                                                                               }) => {
-    const periodOptions = Object.keys(Period).map(key => {
-        return { key: key, text: Period[key as keyof typeof Period], value: key }
-    });
-    const weekDayOptions = Object.keys(WeekDay).filter(key => isNaN(Number(key))).map(weekDay => {
-        const weekDayValue = WeekDay[weekDay as keyof typeof WeekDay];
-        return { key: weekDay, text: weekDayMapping[weekDayValue], value: weekDayValue }
-    });
-    const dateOptions = workingDays(YEAR, MONTH).map(dateTime => {
-        const day = dateTime.day;
-        const weekDay = dateTime.setLocale('zh-TW').weekdayShort.slice(1);
-        return { key: day, text: `${ dateTime.month }/${ day } (${ weekDay })`, value: day }
-    });
+type RepeatedScheduleDetailEditProps = {
+    year: number,
+    month: number,
+    repeatType?: RepeatType,
+    value?: Repeat,
+    onChange?: (repeat: Repeat | undefined) => void
+}
+const RepeatedScheduleDetailEdit: React.FC<RepeatedScheduleDetailEditProps> =
+    ({ year, month, repeatType, value, onChange = Function.prototype }) => {
+        const periodOptions = Object.keys(Period).map(key => {
+            return { key: key, text: Period[key as keyof typeof Period], value: key }
+        });
+        const weekDayOptions = Object.keys(WeekDay).filter(key => isNaN(Number(key))).map(weekDay => {
+            const weekDayValue = WeekDay[weekDay as keyof typeof WeekDay];
+            return { key: weekDay, text: weekDayMapping[weekDayValue], value: weekDayValue }
+        });
+        const dateOptions = workingDays(year, month).map(dateTime => {
+            const day = dateTime.day;
+            const weekDay = dateTime.setLocale('zh-TW').weekdayShort.slice(1);
+            return { key: day, text: `${ dateTime.month }/${ day } (${ weekDay })`, value: day }
+        });
 
-    const [periodKey, _setPeriodKey] = useState<keyof typeof Period>();
-    const setPeriodKey = (event: SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
-        _setPeriodKey(data.value as keyof typeof Period);
-    };
-    const [weekDay, _setWeekDay] = useState<WeekDay>();
-    const setWeekDay = (event: SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
-        _setWeekDay(data.value as WeekDay);
-    };
-    const [date, _setDate] = useState<number>();
-    const setDate = (event: SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
-        if (typeof data.value === 'number') {
-            _setDate(data.value);
-        }
-    };
+        const [periodKey, _setPeriodKey] = useState<keyof typeof Period>();
+        const setPeriodKey = (event: SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
+            _setPeriodKey(data.value as keyof typeof Period);
+        };
+        const [weekDay, _setWeekDay] = useState<WeekDay>();
+        const setWeekDay = (event: SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
+            _setWeekDay(data.value as WeekDay);
+        };
+        const [date, _setDate] = useState<number>();
+        const setDate = (event: SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
+            if (typeof data.value === 'number') {
+                _setDate(data.value);
+            }
+        };
 
-    let node = <noscript/>;
-    let repeat: Repeat | undefined = undefined;
-    if (repeatType === RepeatType.At) {
-        node = (
-            <>
-                <Form.Select key="date" label="日期" placeholder="請選擇日期" required options={ dateOptions } value={ date }
-                             onChange={ setDate }/>
+        let node = <noscript/>;
+        let repeat: Repeat | undefined = undefined;
+        if (repeatType === RepeatType.At) {
+            node = (
+                <>
+                    <Form.Select key="date" label="日期" placeholder="請選擇日期" required options={ dateOptions }
+                                 value={ date }
+                                 onChange={ setDate }/>
+                    <Form.Select key="period" label="時段" placeholder="請選擇時段" required options={ periodOptions }
+                                 value={ periodKey } onChange={ setPeriodKey }/>
+                </>
+            );
+            if (date !== undefined && periodKey !== undefined) {
+                repeat = { type: repeatType, date: date, period: Period[periodKey] }
+            }
+        } else if (repeatType === RepeatType.EvenWeek) {
+            node = (
+                <>
+                    <Form.Select key="weekDay" label="星期幾" placeholder="請選擇星期幾" required options={ weekDayOptions }
+                                 value={ weekDay }
+                                 onChange={ setWeekDay }/>
+                    <Form.Select key="period" label="時段" placeholder="請選擇時段" required options={ periodOptions }
+                                 value={ periodKey } onChange={ setPeriodKey }/>
+                </>
+            );
+            if (weekDay !== undefined && periodKey !== undefined) {
+                repeat = { type: repeatType, weekday: weekDay, period: Period[periodKey] }
+            }
+        } else if (repeatType === RepeatType.OddWeek) {
+            node = (
+                <>
+                    <Form.Select key="weekDay" label="星期幾" placeholder="請選擇星期幾" required options={ weekDayOptions }
+                                 value={ weekDay }
+                                 onChange={ setWeekDay }/>
+                    <Form.Select key="period" label="時段" placeholder="請選擇時段" required options={ periodOptions }
+                                 value={ periodKey } onChange={ setPeriodKey }/>
+                </>
+            );
+            if (weekDay !== undefined && periodKey !== undefined) {
+                repeat = { type: repeatType, weekday: weekDay, period: Period[periodKey] }
+            }
+        } else if (repeatType === RepeatType.Week) {
+            node = (
+                <>
+                    <Form.Select key="weekDay" label="星期幾" placeholder="請選擇星期幾" required options={ weekDayOptions }
+                                 value={ weekDay }
+                                 onChange={ setWeekDay }/>
+                    <Form.Select key="period" label="時段" placeholder="請選擇時段" required options={ periodOptions }
+                                 value={ periodKey } onChange={ setPeriodKey }/>
+                </>
+            );
+            if (weekDay !== undefined && periodKey !== undefined) {
+                repeat = { type: repeatType, weekday: weekDay, period: Period[periodKey] }
+            }
+        } else if (repeatType === RepeatType.Day) {
+            node = (
                 <Form.Select key="period" label="時段" placeholder="請選擇時段" required options={ periodOptions }
                              value={ periodKey } onChange={ setPeriodKey }/>
-            </>
-        );
-        if (date !== undefined && periodKey !== undefined) {
-            repeat = { type: repeatType, date: date, period: Period[periodKey] }
+            );
+            if (periodKey !== undefined) {
+                repeat = { type: repeatType, period: Period[periodKey] }
+            }
+        } else if (repeatType === RepeatType.Period) {
+            repeat = { type: repeatType };
         }
-    } else if (repeatType === RepeatType.EvenWeek) {
-        node = (
-            <>
-                <Form.Select key="weekDay" label="星期幾" placeholder="請選擇星期幾" required options={ weekDayOptions }
-                             value={ weekDay }
-                             onChange={ setWeekDay }/>
-                <Form.Select key="period" label="時段" placeholder="請選擇時段" required options={ periodOptions }
-                             value={ periodKey } onChange={ setPeriodKey }/>
-            </>
-        );
-        if (weekDay !== undefined && periodKey !== undefined) {
-            repeat = { type: repeatType, weekday: weekDay, period: Period[periodKey] }
-        }
-    } else if (repeatType === RepeatType.OddWeek) {
-        node = (
-            <>
-                <Form.Select key="weekDay" label="星期幾" placeholder="請選擇星期幾" required options={ weekDayOptions }
-                             value={ weekDay }
-                             onChange={ setWeekDay }/>
-                <Form.Select key="period" label="時段" placeholder="請選擇時段" required options={ periodOptions }
-                             value={ periodKey } onChange={ setPeriodKey }/>
-            </>
-        );
-        if (weekDay !== undefined && periodKey !== undefined) {
-            repeat = { type: repeatType, weekday: weekDay, period: Period[periodKey] }
-        }
-    } else if (repeatType === RepeatType.Week) {
-        node = (
-            <>
-                <Form.Select key="weekDay" label="星期幾" placeholder="請選擇星期幾" required options={ weekDayOptions }
-                             value={ weekDay }
-                             onChange={ setWeekDay }/>
-                <Form.Select key="period" label="時段" placeholder="請選擇時段" required options={ periodOptions }
-                             value={ periodKey } onChange={ setPeriodKey }/>
-            </>
-        );
-        if (weekDay !== undefined && periodKey !== undefined) {
-            repeat = { type: repeatType, weekday: weekDay, period: Period[periodKey] }
-        }
-    } else if (repeatType === RepeatType.Day) {
-        node = (
-            <Form.Select key="period" label="時段" placeholder="請選擇時段" required options={ periodOptions }
-                         value={ periodKey } onChange={ setPeriodKey }/>
-        );
-        if (periodKey !== undefined) {
-            repeat = { type: repeatType, period: Period[periodKey] }
-        }
-    } else if (repeatType === RepeatType.Period) {
-        repeat = { type: repeatType };
-    }
 
-    useEffect(() => {
-        if (!isEqual(repeat, value)) {
-            onChange(repeat)
-        }
-    });
-    return node;
-};
+        useEffect(() => {
+            if (!isEqual(repeat, value)) {
+                onChange(repeat)
+            }
+        });
+        return node;
+    };
 
 const defaultPerson: Person = new Person('王小明', Role.AssistantChiefResident, Gender.Male);
 const defaultRepeatedSchedule: RepeatedSchedule =
     new RepeatedSchedule(Type.W5Slide, 2019, 5, { type: RepeatType.Week, weekday: 5, period: Period.Afternoon });
 
+const now = DateTime.local();
+const yearOptions = Array(5).fill(1).map((_, i) => {
+    const year = i + now.year;
+    return { key: year, text: year.toString(), value: year }
+});
+const monthOptions = Array(12).fill(1).map((_, i) => {
+    const month = i + 1;
+    return { key: month, text: month.toString(), value: month }
+});
+type YearMonthChooseProps = { year: number, month: number, setYear: Dispatch<SetStateAction<number>>, setMonth: Dispatch<SetStateAction<number>> }
+const YearMonthChooser: React.FC<YearMonthChooseProps> = ({ year, month, setYear, setMonth }) => {
+    return (
+        <Form>
+            <Form.Group inline>
+                <Form.Select compact placeholder="請選擇年份" options={ yearOptions } value={ year }
+                             onChange={ (event, data) => {
+                                 if (typeof data.value === 'number') setYear(data.value)
+                             } }/>
+                <label>年</label>
+                <Form.Select compact placeholder="請選擇月份" options={ monthOptions } value={ month }
+                             onChange={ (event, data) => {
+                                 if (typeof data.value === 'number') setMonth(data.value)
+                             } }/>
+                <label>月</label>
+            </Form.Group>
+        </Form>
+    )
+};
 const App: React.FC = () => {
+    const [year, setYear] = useState<number>(now.year);
+    const [month, setMonth] = useState<number>((now.plus({ month: 1 })).month);
     const [person, setPerson] = useState<Person>(defaultPerson);
     const [repeatedSchedule, setRepeatedSchedule] = useState<RepeatedSchedule>(defaultRepeatedSchedule);
 
     return (
         <Container style={ { margin: 20 } }>
-            <Header as="h3">編輯排班</Header>
-            <Grid columns={ 2 }>
-                <Grid.Column>
-                    <PersonDisplay person={ person }/>
-                    <PersonEdit onSubmit={ setPerson }/>
-                </Grid.Column>
-                <Grid.Column>
-                    <RepeatedScheduleEdit onSubmit={ repeatedSchedule => setRepeatedSchedule(repeatedSchedule) }/>
-                    <RepeatedScheduleDisplay repeatedSchedule={ repeatedSchedule }/>
-                </Grid.Column>
-            </Grid>
+            <Segment as="section" basic>
+                <Header as="h3">選擇時間</Header>
+                <YearMonthChooser year={ year } month={ month } setYear={ setYear } setMonth={ setMonth }/>
+            </Segment>
+            <Segment as="section" basic>
+                <Header as="h3">編輯班次</Header>
+                <RepeatedScheduleEdit year={ year } month={ month }
+                                      onSubmit={ repeatedSchedule => setRepeatedSchedule(repeatedSchedule) }/>
+                <RepeatedScheduleDisplay repeatedSchedule={ repeatedSchedule }/>
+            </Segment>
+            <Segment as="section" basic>
+                <Header as="h3">參與者</Header>
+                <PersonDisplay person={ person }/>
+                <PersonEdit onSubmit={ setPerson }/>
+            </Segment>
         </Container>
     );
 };
