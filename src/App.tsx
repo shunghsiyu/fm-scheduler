@@ -1,5 +1,16 @@
 import React, { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useEffect, useState } from 'react';
-import { Card, Container, DropdownProps, Form, Header, InputOnChangeData, Segment, Table } from 'semantic-ui-react'
+import {
+    Accordion,
+    Card,
+    Container,
+    DropdownProps,
+    Form,
+    Header,
+    Icon,
+    InputOnChangeData,
+    Segment,
+    Table
+} from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css'
 import Person, { Gender, Role } from './Person'
 import { RepeatedSchedule, Type } from "./Schedule"
@@ -65,8 +76,8 @@ const PersonEdit: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = pro
     );
 };
 
-const RepeatedScheduleDisplay: React.FC<{ repeatedSchedule: RepeatedSchedule }> = ({ repeatedSchedule }) => {
-    const schedules = repeatedSchedule.toSchedules();
+const RepeatedScheduleDisplay: React.FC<{ repeatedSchedules: RepeatedSchedule[] }> = ({ repeatedSchedules }) => {
+    const schedules = repeatedSchedules.flatMap(repeatedSchedule => repeatedSchedule.toSchedules());
     const tableRows = schedules.map((schedule, idx) => {
         const { type, time } = schedule;
         return (
@@ -90,6 +101,43 @@ const RepeatedScheduleDisplay: React.FC<{ repeatedSchedule: RepeatedSchedule }> 
                 { tableRows }
             </Table.Body>
         </Table>
+    )
+};
+
+type SchedulesEditProps = {
+    year: number,
+    month: number,
+    value: RepeatedSchedule[],
+    onChange?: Dispatch<SetStateAction<RepeatedSchedule[]>>
+}
+const SchedulesEdit: React.FC<SchedulesEditProps> = ({ year, month, value, onChange = Function.prototype }) => {
+    const tableRows = value.map((repeatedSchedule, idx) => {
+        const { type, repeat } = repeatedSchedule;
+        return (
+            <Table.Row key={ idx }>
+                <Table.Cell>
+                    { Object.values(repeat).join(' ') }
+                </Table.Cell>
+                <Table.Cell>{ type }</Table.Cell>
+            </Table.Row>
+        );
+    });
+    return (
+        <>
+            <Table singleLine>
+                <Table.Header>
+                    <Table.Row>
+                        <Table.HeaderCell>時間</Table.HeaderCell>
+                        <Table.HeaderCell>工作</Table.HeaderCell>
+                    </Table.Row>
+                </Table.Header>
+                <Table.Body>
+                    { tableRows }
+                </Table.Body>
+            </Table>
+            <RepeatedScheduleEdit year={ year } month={ month }
+                                  onSubmit={ repeatedSchedule => onChange([repeatedSchedule]) }/>
+        </>
     )
 };
 
@@ -137,8 +185,8 @@ const RepeatedScheduleEdit: React.FC<RepeatedScheduleEditProps> = ({ year, month
                 <Form.Select compact key="type" placeholder="請選擇工作" options={ typeOptions }
                              value={ typeKey }
                              onChange={ setTypeKeyOnChange }/>
+                <Form.Button positive>新增</Form.Button>
             </Form.Group>
-            <Form.Button positive>送出</Form.Button>
         </Form>
     );
 };
@@ -290,7 +338,7 @@ const App: React.FC = () => {
     const [year, setYear] = useState<number>(now.year);
     const [month, setMonth] = useState<number>((now.plus({ month: 1 })).month);
     const [person, setPerson] = useState<Person>(defaultPerson);
-    const [repeatedSchedule, setRepeatedSchedule] = useState<RepeatedSchedule>(defaultRepeatedSchedule);
+    const [repeatedSchedules, setRepeatedSchedules] = useState<RepeatedSchedule[]>([defaultRepeatedSchedule]);
 
     return (
         <Container style={ { margin: 20 } }>
@@ -300,9 +348,17 @@ const App: React.FC = () => {
             </Segment>
             <Segment as="section" basic>
                 <Header as="h3">編輯班次</Header>
-                <RepeatedScheduleEdit year={ year } month={ month }
-                                      onSubmit={ repeatedSchedule => setRepeatedSchedule(repeatedSchedule) }/>
-                <RepeatedScheduleDisplay repeatedSchedule={ repeatedSchedule }/>
+                <SchedulesEdit year={ year } month={ month } value={ repeatedSchedules }
+                               onChange={ setRepeatedSchedules }/>
+                <Accordion>
+                    <Accordion.Title active>
+                        <Icon name='dropdown'/>
+                        顯示詳細班次
+                    </Accordion.Title>
+                    <Accordion.Content active>
+                        <RepeatedScheduleDisplay repeatedSchedules={ repeatedSchedules }/>
+                    </Accordion.Content>
+                </Accordion>
             </Segment>
             <Segment as="section" basic>
                 <Header as="h3">參與者</Header>
