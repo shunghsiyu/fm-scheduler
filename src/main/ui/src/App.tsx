@@ -125,15 +125,19 @@ const RepeatedScheduleEdit: React.FC<RepeatedScheduleEditProps> = ({ year, month
 
     return (
         <Form onSubmit={ submitRepeatedSchedule }>
-            <Form.Select key="repeatType" label="重複" placeholder="請重複頻率" required options={ repeatTypeOptions }
-                         value={ repeatTypeKey }
-                         onChange={ setRepeatTypeKeyOnChange }/>
-            <RepeatedScheduleDetailEdit year={ year } month={ month }
-                                        repeatType={ repeatTypeKey ? RepeatType[repeatTypeKey] : undefined }
-                                        value={ repeat }
-                                        onChange={ r => setRepeat(r) }/>
-            <Form.Select key="type" label="工作" placeholder="請選擇工作" required options={ typeOptions } value={ typeKey }
-                         onChange={ setTypeKeyOnChange }/>
+            <Form.Group inline>
+                <Form.Select compact key="repeatType" placeholder="請重複頻率" options={ repeatTypeOptions }
+                             value={ repeatTypeKey }
+                             onChange={ setRepeatTypeKeyOnChange }/>
+                <RepeatedScheduleDetailEdit year={ year } month={ month }
+                                            repeatType={ repeatTypeKey ? RepeatType[repeatTypeKey] : undefined }
+                                            value={ repeat }
+                                            onChange={ r => setRepeat(r) }/>
+                <label>要</label>
+                <Form.Select compact key="type" placeholder="請選擇工作" options={ typeOptions }
+                             value={ typeKey }
+                             onChange={ setTypeKeyOnChange }/>
+            </Form.Group>
             <Form.Button positive>送出</Form.Button>
         </Form>
     );
@@ -181,10 +185,10 @@ const RepeatedScheduleDetailEdit: React.FC<RepeatedScheduleDetailEditProps> =
         if (repeatType === RepeatType.At) {
             node = (
                 <>
-                    <Form.Select key="date" label="日期" placeholder="請選擇日期" required options={ dateOptions }
+                    <Form.Select compact key="date" placeholder="請選擇日期" options={ dateOptions }
                                  value={ date }
                                  onChange={ setDate }/>
-                    <Form.Select key="period" label="時段" placeholder="請選擇時段" required options={ periodOptions }
+                    <Form.Select compact key="period" placeholder="請選擇時段" options={ periodOptions }
                                  value={ periodKey } onChange={ setPeriodKey }/>
                 </>
             );
@@ -194,10 +198,10 @@ const RepeatedScheduleDetailEdit: React.FC<RepeatedScheduleDetailEditProps> =
         } else if (repeatType === RepeatType.EvenWeek) {
             node = (
                 <>
-                    <Form.Select key="weekDay" label="星期幾" placeholder="請選擇星期幾" required options={ weekDayOptions }
+                    <Form.Select compact key="weekDay" placeholder="請選擇星期幾" options={ weekDayOptions }
                                  value={ weekDay }
                                  onChange={ setWeekDay }/>
-                    <Form.Select key="period" label="時段" placeholder="請選擇時段" required options={ periodOptions }
+                    <Form.Select compact key="period" placeholder="請選擇時段" options={ periodOptions }
                                  value={ periodKey } onChange={ setPeriodKey }/>
                 </>
             );
@@ -207,10 +211,10 @@ const RepeatedScheduleDetailEdit: React.FC<RepeatedScheduleDetailEditProps> =
         } else if (repeatType === RepeatType.OddWeek) {
             node = (
                 <>
-                    <Form.Select key="weekDay" label="星期幾" placeholder="請選擇星期幾" required options={ weekDayOptions }
+                    <Form.Select compact key="weekDay" placeholder="請選擇星期幾" options={ weekDayOptions }
                                  value={ weekDay }
                                  onChange={ setWeekDay }/>
-                    <Form.Select key="period" label="時段" placeholder="請選擇時段" required options={ periodOptions }
+                    <Form.Select compact key="period" placeholder="請選擇時段" options={ periodOptions }
                                  value={ periodKey } onChange={ setPeriodKey }/>
                 </>
             );
@@ -220,10 +224,10 @@ const RepeatedScheduleDetailEdit: React.FC<RepeatedScheduleDetailEditProps> =
         } else if (repeatType === RepeatType.Week) {
             node = (
                 <>
-                    <Form.Select key="weekDay" label="星期幾" placeholder="請選擇星期幾" required options={ weekDayOptions }
+                    <Form.Select compact key="weekDay" placeholder="請選擇星期幾" options={ weekDayOptions }
                                  value={ weekDay }
                                  onChange={ setWeekDay }/>
-                    <Form.Select key="period" label="時段" placeholder="請選擇時段" required options={ periodOptions }
+                    <Form.Select compact key="period" placeholder="請選擇時段" options={ periodOptions }
                                  value={ periodKey } onChange={ setPeriodKey }/>
                 </>
             );
@@ -232,7 +236,7 @@ const RepeatedScheduleDetailEdit: React.FC<RepeatedScheduleDetailEditProps> =
             }
         } else if (repeatType === RepeatType.Day) {
             node = (
-                <Form.Select key="period" label="時段" placeholder="請選擇時段" required options={ periodOptions }
+                <Form.Select compact key="period" placeholder="請選擇時段" options={ periodOptions }
                              value={ periodKey } onChange={ setPeriodKey }/>
             );
             if (periodKey !== undefined) {
