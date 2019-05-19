@@ -52,6 +52,14 @@ export default class Time {
         const dayOfWeek = date.weekdayShort.slice(1);
         return `${ date.month }/${ date.day } (${ dayOfWeek })`;
     }
+
+    comparesTo(another: Time) {
+        let diff = this.date.toMillis() - another.date.toMillis();
+        if (diff === 0) {
+            diff = another.period.localeCompare(this.period)
+        }
+        return diff;
+    }
 };
 
 export enum RepeatType {
