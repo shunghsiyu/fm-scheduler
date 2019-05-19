@@ -1,6 +1,7 @@
 import React, { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useEffect, useState } from 'react';
 import {
-    Accordion, Button,
+    Accordion,
+    Button,
     Card,
     Container,
     DropdownProps,
@@ -141,7 +142,7 @@ const SchedulesEdit: React.FC<SchedulesEditProps> = ({ year, month, value, onCha
                     <Table.Row>
                         <Table.HeaderCell>時間</Table.HeaderCell>
                         <Table.HeaderCell>工作</Table.HeaderCell>
-                        <Table.HeaderCell>{""}</Table.HeaderCell>
+                        <Table.HeaderCell>{ "" }</Table.HeaderCell>
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -315,9 +316,6 @@ const RepeatedScheduleDetailEdit: React.FC<RepeatedScheduleDetailEditProps> =
         return node;
     };
 
-const defaultPerson: Person = new Person('王小明', Role.AssistantChiefResident, Gender.Male);
-const defaultRepeatedSchedule: RepeatedSchedule =
-    new RepeatedSchedule(Type.W5Slide, 2019, 5, { type: RepeatType.Week, weekday: 5, period: Period.Afternoon });
 
 const now = DateTime.local();
 const yearOptions = Array(5).fill(1).map((_, i) => {
@@ -347,11 +345,34 @@ const YearMonthChooser: React.FC<YearMonthChooseProps> = ({ year, month, setYear
         </Form>
     )
 };
+
+const defaultPerson: Person = new Person('王小明', Role.AssistantChiefResident, Gender.Male);
+const defaultRepeatedSchedules: RepeatedSchedule[] = [
+    new RepeatedSchedule(Type.MorningNote, now.year, now.month + 1, { type: RepeatType.Day, period: Period.Morning }),
+    new RepeatedSchedule(Type.MorningSlide, now.year, now.month + 1, { type: RepeatType.Day, period: Period.Morning }),
+    new RepeatedSchedule(Type.Jingfu, now.year, now.month + 1, {
+        type: RepeatType.Week,
+        weekday: 2,
+        period: Period.Afternoon
+    }),
+    new RepeatedSchedule(Type.W5Note, now.year, now.month + 1, {
+        type: RepeatType.Week,
+        weekday: 5,
+        period: Period.Afternoon
+    }),
+    new RepeatedSchedule(Type.W5Slide, now.year, now.month + 1, {
+        type: RepeatType.Week,
+        weekday: 5,
+        period: Period.Afternoon
+    }),
+    new RepeatedSchedule(Type.PAP, now.year, now.month + 1, { type: RepeatType.Period }),
+];
 const App: React.FC = () => {
     const [year, setYear] = useState<number>(now.year);
     const [month, setMonth] = useState<number>((now.plus({ month: 1 })).month);
+    const [repeatedSchedules, setRepeatedSchedules] = useState<RepeatedSchedule[]>(defaultRepeatedSchedules);
+    const [accordionState, setAccordionState] = useState<boolean>(false);
     const [person, setPerson] = useState<Person>(defaultPerson);
-    const [repeatedSchedules, setRepeatedSchedules] = useState<RepeatedSchedule[]>([defaultRepeatedSchedule]);
 
     return (
         <Container style={ { margin: 20, backgroundColor: "grey" } }>
@@ -364,11 +385,11 @@ const App: React.FC = () => {
                 <SchedulesEdit year={ year } month={ month } value={ repeatedSchedules }
                                onChange={ setRepeatedSchedules }/>
                 <Accordion>
-                    <Accordion.Title active>
+                    <Accordion.Title active={ accordionState } onClick={ () => setAccordionState(!accordionState) }>
                         <Icon name='dropdown'/>
                         顯示詳細班次
                     </Accordion.Title>
-                    <Accordion.Content active>
+                    <Accordion.Content active={ accordionState }>
                         <RepeatedScheduleDisplay repeatedSchedules={ repeatedSchedules }/>
                     </Accordion.Content>
                 </Accordion>
