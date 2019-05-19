@@ -22,6 +22,14 @@ export default class Schedule {
         this.time = time;
         this.assignee = assignee;
     }
+
+    comparesTo(another: Schedule) {
+        let diff = this.time.comparesTo(another.time);
+        if (diff === 0) {
+            diff = this.type.localeCompare(another.type)
+        }
+        return diff;
+    }
 }
 
 export class RepeatedSchedule {
