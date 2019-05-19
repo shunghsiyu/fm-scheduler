@@ -78,7 +78,7 @@ const PersonEdit: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = pro
 
 const RepeatedScheduleDisplay: React.FC<{ repeatedSchedules: RepeatedSchedule[] }> = ({ repeatedSchedules }) => {
     const schedules = repeatedSchedules.flatMap(repeatedSchedule => repeatedSchedule.toSchedules());
-    const tableRows = schedules.map((schedule, idx) => {
+    const tableRows = schedules.sort((a, b) => a.comparesTo(b)).map((schedule, idx) => {
         const { type, time } = schedule;
         return (
             <Table.Row key={ idx }>
