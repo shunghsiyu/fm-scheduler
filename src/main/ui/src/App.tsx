@@ -1,6 +1,6 @@
 import React, { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useEffect, useState } from 'react';
 import {
-    Accordion,
+    Accordion, Button,
     Card,
     Container,
     DropdownProps,
@@ -113,12 +113,24 @@ type SchedulesEditProps = {
 const SchedulesEdit: React.FC<SchedulesEditProps> = ({ year, month, value, onChange = Function.prototype }) => {
     const tableRows = value.map((repeatedSchedule, idx) => {
         const { type, repeat } = repeatedSchedule;
+        const deleteSchedule = (): void => {
+            const newValue = value.slice();
+            newValue.splice(idx, 1);
+            console.log(newValue);
+            onChange(newValue)
+        };
+        const repeatStr = Object.values(repeat).join(' ');
         return (
-            <Table.Row key={ idx }>
+            <Table.Row key={ repeatStr + type }>
                 <Table.Cell>
-                    { Object.values(repeat).join(' ') }
+                    { repeatStr }
                 </Table.Cell>
-                <Table.Cell>{ type }</Table.Cell>
+                <Table.Cell>
+                    { type }
+                </Table.Cell>
+                <Table.Cell collapsing>
+                    <Button icon="delete" size="mini" onClick={ deleteSchedule }/>
+                </Table.Cell>
             </Table.Row>
         );
     });
@@ -129,6 +141,7 @@ const SchedulesEdit: React.FC<SchedulesEditProps> = ({ year, month, value, onCha
                     <Table.Row>
                         <Table.HeaderCell>時間</Table.HeaderCell>
                         <Table.HeaderCell>工作</Table.HeaderCell>
+                        <Table.HeaderCell>{""}</Table.HeaderCell>
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -136,7 +149,7 @@ const SchedulesEdit: React.FC<SchedulesEditProps> = ({ year, month, value, onCha
                 </Table.Body>
             </Table>
             <RepeatedScheduleEdit year={ year } month={ month }
-                                  onSubmit={ repeatedSchedule => onChange([repeatedSchedule]) }/>
+                                  onSubmit={ repeatedSchedule => onChange([...value, repeatedSchedule]) }/>
         </>
     )
 };
@@ -341,7 +354,7 @@ const App: React.FC = () => {
     const [repeatedSchedules, setRepeatedSchedules] = useState<RepeatedSchedule[]>([defaultRepeatedSchedule]);
 
     return (
-        <Container style={ { margin: 20 } }>
+        <Container style={ { margin: 20, backgroundColor: "grey" } }>
             <Segment as="section" basic>
                 <Header as="h3">選擇時間</Header>
                 <YearMonthChooser year={ year } month={ month } setYear={ setYear } setMonth={ setMonth }/>
