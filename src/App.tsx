@@ -21,7 +21,7 @@ import { DateTime } from "luxon";
 
 const PersonDisplay: React.FC<{ person: Person }> = props => {
     return (
-        <Card>
+        <Card as="section" fluid>
             <Card.Content>
                 <Card.Header>{ props.person.name }
                     <small style={ { padding: '0.5em' } }>({ props.person.gender })</small>
@@ -58,7 +58,7 @@ const PersonEdit: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = pro
     };
 
     return (
-        <Card>
+        <Card as="section" fluid>
             <Card.Content>
                 <Card.Header>新增人員</Card.Header>
             </Card.Content>
@@ -90,7 +90,7 @@ const ScheduleEdit: React.FC<{ value: Schedule[], onChange?: Dispatch<SetStateAc
             deleteButton = <Button icon="delete" size="mini" onClick={ deleteSchedule }/>;
         }
         return (
-            <Table.Row key={ idx }>
+            <Table.Row key={ type + time.date.toISODate() + time.period }>
                 <Table.Cell>{ time.dateStr() }
                     <small> { time.period }</small>
                 </Table.Cell>
@@ -394,17 +394,19 @@ const App: React.FC = () => {
     return (
         <Container style={ { margin: 20 } }>
             <Segment as="section" basic>
-                <Header as="h3">選擇時間</Header>
+                <Header as="h2">選擇時間</Header>
                 <YearMonthChooser year={ year } month={ month } setYear={ setYear } setMonth={ setMonth }/>
             </Segment>
             <Segment as="section" basic>
-                <Header as="h3">編輯班次</Header>
+                <Header as="h2">編輯班次</Header>
                 <RepeatedSchedulesEdit year={ year } month={ month } value={ repeatedSchedules }
                                        onChange={ setRepeatedSchedules }/>
-                <Accordion>
+                <Accordion as="section">
                     <Accordion.Title active={ accordionState } onClick={ () => setAccordionState(!accordionState) }>
-                        <Icon name='dropdown'/>
-                        {accordionState ? "隱藏" : "顯示"}詳細班次
+                        <Header as="h3">
+                            <Icon name='dropdown'/>
+                            { accordionState ? "隱藏" : "顯示" }詳細班次
+                        </Header>
                     </Accordion.Title>
                     <Accordion.Content active={ accordionState }>
                         <ScheduleEdit value={ schedules } onChange={ setSchedules }/>
@@ -412,7 +414,7 @@ const App: React.FC = () => {
                 </Accordion>
             </Segment>
             <Segment as="section" basic>
-                <Header as="h3">參與者</Header>
+                <Header as="h2">參與者</Header>
                 <PersonDisplay person={ person }/>
                 <PersonEdit onSubmit={ setPerson }/>
             </Segment>
