@@ -14,7 +14,7 @@ import {
 } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css'
 import Person, { Gender, Role } from './Person'
-import { RepeatedSchedule, Type } from "./Schedule"
+import Schedule, { RepeatedSchedule, Type } from "./Schedule"
 import { Period, Repeat, RepeatType, WeekDay, weekDayMapping, workingDays } from "./Time"
 import isEqual from "lodash.isequal"
 import { DateTime } from "luxon";
@@ -77,16 +77,25 @@ const PersonEdit: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = pro
     );
 };
 
-const RepeatedScheduleDisplay: React.FC<{ repeatedSchedules: RepeatedSchedule[] }> = ({ repeatedSchedules }) => {
-    const schedules = repeatedSchedules.flatMap(repeatedSchedule => repeatedSchedule.toSchedules());
-    const tableRows = schedules.sort((a, b) => a.comparesTo(b)).map((schedule, idx) => {
+const ScheduleEdit: React.FC<{ value: Schedule[], onChange?: Dispatch<SetStateAction<Schedule[]>> }> = ({ onChange, value }) => {
+    const tableRows = value.map((schedule, idx) => {
         const { type, time } = schedule;
+        let deleteButton = null;
+        if (onChange) {
+            const deleteSchedule = (): void => {
+                const newValue = value.slice();
+                newValue.splice(idx, 1);
+                onChange(newValue)
+            };
+            deleteButton = <Button icon="delete" size="mini" onClick={ deleteSchedule }/>;
+        }
         return (
             <Table.Row key={ idx }>
                 <Table.Cell>{ time.dateStr() }
                     <small> { time.period }</small>
                 </Table.Cell>
                 <Table.Cell>{ type }</Table.Cell>
+                <Table.Cell collapsing>{ deleteButton }</Table.Cell>
             </Table.Row>
         );
     });
@@ -96,6 +105,7 @@ const RepeatedScheduleDisplay: React.FC<{ repeatedSchedules: RepeatedSchedule[] 
                 <Table.Row>
                     <Table.HeaderCell>時間</Table.HeaderCell>
                     <Table.HeaderCell>工作</Table.HeaderCell>
+                    <Table.HeaderCell collapsing>{ "" }</Table.HeaderCell>
                 </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -105,19 +115,18 @@ const RepeatedScheduleDisplay: React.FC<{ repeatedSchedules: RepeatedSchedule[] 
     )
 };
 
-type SchedulesEditProps = {
+type RepeatedSchedulesEditProps = {
     year: number,
     month: number,
     value: RepeatedSchedule[],
-    onChange?: Dispatch<SetStateAction<RepeatedSchedule[]>>
+    onChange?: Dispatch<SetStateAction<RepeatedSchedule[]>>,
 }
-const SchedulesEdit: React.FC<SchedulesEditProps> = ({ year, month, value, onChange = Function.prototype }) => {
+const RepeatedSchedulesEdit: React.FC<RepeatedSchedulesEditProps> = ({ year, month, value, onChange = Function.prototype }) => {
     const tableRows = value.map((repeatedSchedule, idx) => {
         const { type, repeat } = repeatedSchedule;
-        const deleteSchedule = (): void => {
+        const deleteRepeatedSchedule = (): void => {
             const newValue = value.slice();
             newValue.splice(idx, 1);
-            console.log(newValue);
             onChange(newValue)
         };
         const repeatStr = Object.values(repeat).join(' ');
@@ -130,7 +139,7 @@ const SchedulesEdit: React.FC<SchedulesEditProps> = ({ year, month, value, onCha
                     { type }
                 </Table.Cell>
                 <Table.Cell collapsing>
-                    <Button icon="delete" size="mini" onClick={ deleteSchedule }/>
+                    <Button icon="delete" size="mini" onClick={ deleteRepeatedSchedule }/>
                 </Table.Cell>
             </Table.Row>
         );
@@ -142,25 +151,25 @@ const SchedulesEdit: React.FC<SchedulesEditProps> = ({ year, month, value, onCha
                     <Table.Row>
                         <Table.HeaderCell>時間</Table.HeaderCell>
                         <Table.HeaderCell>工作</Table.HeaderCell>
-                        <Table.HeaderCell>{ "" }</Table.HeaderCell>
+                        <Table.HeaderCell collapsing>{ "" }</Table.HeaderCell>
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
                     { tableRows }
                 </Table.Body>
             </Table>
-            <RepeatedScheduleEdit year={ year } month={ month }
-                                  onSubmit={ repeatedSchedule => onChange([...value, repeatedSchedule]) }/>
+            <RepeatedScheduleAdd year={ year } month={ month }
+                                 onSubmit={ repeatedSchedule => onChange([...value, repeatedSchedule]) }/>
         </>
     )
 };
 
-type RepeatedScheduleEditProps = {
+type RepeatedScheduleAddProps = {
     year: number,
     month: number,
     onSubmit?: Dispatch<SetStateAction<RepeatedSchedule>>
 }
-const RepeatedScheduleEdit: React.FC<RepeatedScheduleEditProps> = ({ year, month, onSubmit = Function.prototype }) => {
+const RepeatedScheduleAdd: React.FC<RepeatedScheduleAddProps> = ({ year, month, onSubmit = Function.prototype }) => {
     const repeatTypeOptions = Object.keys(RepeatType).map(key => {
         return { key: key, text: RepeatType[key as keyof typeof RepeatType], value: key }
     });
@@ -367,30 +376,38 @@ const defaultRepeatedSchedules: RepeatedSchedule[] = [
     }),
     new RepeatedSchedule(Type.PAP, now.year, now.month + 1, { type: RepeatType.Period }),
 ];
+const defaultSchedules = defaultRepeatedSchedules.flatMap(r => r.toSchedules()).sort((a, b) => a.comparesTo(b));
 const App: React.FC = () => {
     const [year, setYear] = useState<number>(now.year);
     const [month, setMonth] = useState<number>((now.plus({ month: 1 })).month);
-    const [repeatedSchedules, setRepeatedSchedules] = useState<RepeatedSchedule[]>(defaultRepeatedSchedules);
+    const [repeatedSchedules, _setRepeatedSchedules] = useState<RepeatedSchedule[]>(defaultRepeatedSchedules);
+    const [schedules, setSchedules] = useState<Schedule[]>(defaultSchedules);
     const [accordionState, setAccordionState] = useState<boolean>(false);
+    const setRepeatedSchedules: Dispatch<SetStateAction<RepeatedSchedule[]>> = value => {
+        const schedules = (value as RepeatedSchedule[]).flatMap(r => r.toSchedules()).sort((a, b) => a.comparesTo(b));
+        setSchedules(schedules);
+        setAccordionState(true);
+        _setRepeatedSchedules(value);
+    };
     const [person, setPerson] = useState<Person>(defaultPerson);
 
     return (
-        <Container style={ { margin: 20, backgroundColor: "grey" } }>
+        <Container style={ { margin: 20 } }>
             <Segment as="section" basic>
                 <Header as="h3">選擇時間</Header>
                 <YearMonthChooser year={ year } month={ month } setYear={ setYear } setMonth={ setMonth }/>
             </Segment>
             <Segment as="section" basic>
                 <Header as="h3">編輯班次</Header>
-                <SchedulesEdit year={ year } month={ month } value={ repeatedSchedules }
-                               onChange={ setRepeatedSchedules }/>
+                <RepeatedSchedulesEdit year={ year } month={ month } value={ repeatedSchedules }
+                                       onChange={ setRepeatedSchedules }/>
                 <Accordion>
                     <Accordion.Title active={ accordionState } onClick={ () => setAccordionState(!accordionState) }>
                         <Icon name='dropdown'/>
-                        顯示詳細班次
+                        {accordionState ? "隱藏" : "顯示"}詳細班次
                     </Accordion.Title>
                     <Accordion.Content active={ accordionState }>
-                        <RepeatedScheduleDisplay repeatedSchedules={ repeatedSchedules }/>
+                        <ScheduleEdit value={ schedules } onChange={ setSchedules }/>
                     </Accordion.Content>
                 </Accordion>
             </Segment>
