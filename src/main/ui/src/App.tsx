@@ -64,31 +64,32 @@ const PersonEdit: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = pro
             </Card.Content>
             <Card.Content>
                 <Form onSubmit={ addPerson }>
-                    <Form.Input label="姓名" placeholder="請輸入姓名" required value={ name }
-                                onChange={ setName }/>
-                    <Form.Select label="性別" placeholder="請選擇性別" required options={ genderOptions }
-                                 onChange={ setGender }/>
-                    <Form.Select label="身份" placeholder="請選擇身份" required options={ roleOptions }
-                                 onChange={ setRole }/>
-                    <Form.Button positive>新增</Form.Button>
+                    <Form.Group inline>
+                        <Form.Input label="姓名" placeholder="請輸入姓名" required value={ name }
+                                    onChange={ setName }/>
+                        <Form.Select label="性別" placeholder="請選擇性別" required options={ genderOptions }
+                                     onChange={ setGender }/>
+                        <Form.Select label="身份" placeholder="請選擇身份" required options={ roleOptions }
+                                     onChange={ setRole }/>
+                    </Form.Group>
+                    <Form.Group inline style={ { justifyContent: "flex-end" } }>
+                        <Form.Button positive>新增</Form.Button>
+                    </Form.Group>
                 </Form>
             </Card.Content>
         </Card>
     );
 };
 
-const ScheduleEdit: React.FC<{ value: Schedule[], onChange?: Dispatch<SetStateAction<Schedule[]>> }> = ({ onChange, value }) => {
+const ScheduleEdit: React.FC<{ value: Schedule[], onChange: Dispatch<SetStateAction<Schedule[]>> }> = ({ onChange, value }) => {
     const tableRows = value.map((schedule, idx) => {
         const { type, time } = schedule;
-        let deleteButton = null;
-        if (onChange) {
-            const deleteSchedule = (): void => {
-                const newValue = value.slice();
-                newValue.splice(idx, 1);
-                onChange(newValue)
-            };
-            deleteButton = <Button icon="delete" size="mini" onClick={ deleteSchedule }/>;
-        }
+        const deleteSchedule = (): void => {
+            const newValue = value.slice();
+            newValue.splice(idx, 1);
+            onChange(newValue)
+        };
+        const deleteButton = <Button icon="delete" size="mini" onClick={ deleteSchedule }/>;
         return (
             <Table.Row key={ type + time.date.toISODate() + time.period }>
                 <Table.Cell>{ time.dateStr() }
@@ -196,7 +197,7 @@ const RepeatedScheduleAdd: React.FC<RepeatedScheduleAddProps> = ({ year, month, 
 
     return (
         <Form onSubmit={ submitRepeatedSchedule }>
-            <Form.Group inline>
+            <Form.Group inline style={ { justifyContent: "flex-end" } }>
                 <Form.Select compact key="repeatType" placeholder="請重複頻率" options={ repeatTypeOptions }
                              value={ repeatTypeKey }
                              onChange={ setRepeatTypeKeyOnChange }/>
@@ -405,10 +406,11 @@ const App: React.FC = () => {
                     <Accordion.Title active={ accordionState } onClick={ () => setAccordionState(!accordionState) }>
                         <Header as="h3">
                             <Icon name='dropdown'/>
-                            { accordionState ? "隱藏" : "顯示" }詳細班次
+                            { accordionState ? "隱藏" : "編輯" }詳細班次
                         </Header>
                     </Accordion.Title>
                     <Accordion.Content active={ accordionState }>
+                        <p>編輯上方班次後，下面詳細班次將會重置</p>
                         <ScheduleEdit value={ schedules } onChange={ setSchedules }/>
                     </Accordion.Content>
                 </Accordion>
