@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, Dispatch, ReactNode, SetStateAction, SyntheticEvent, useEffect, useState } from 'react';
 import {
     Accordion,
     Button,
@@ -9,6 +9,7 @@ import {
     Header,
     Icon,
     InputOnChangeData,
+    Label,
     Segment,
     Table
 } from 'semantic-ui-react'
@@ -19,14 +20,28 @@ import { Period, Repeat, RepeatType, WeekDay, weekDayMapping, workingDays } from
 import isEqual from "lodash.isequal"
 import { DateTime } from "luxon";
 
-const PersonDisplay: React.FC<{ person: Person }> = props => {
+type BasicProps = {
+    year: number,
+    month: number,
+}
+
+type PersonScheduleEditProps = {
+    value: Person,
+} & BasicProps;
+const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, value }) => {
     return (
         <Card as="section" fluid>
             <Card.Content>
-                <Card.Header>{ props.person.name }
-                    <small style={ { padding: '0.5em' } }>({ props.person.gender })</small>
+                <Card.Header>{ value.name }
+                    <small style={ { padding: '0.5em' } }>({ value.gender })</small>
+                    <Label corner="right"><Icon name="delete" style={ { cursor: "pointer" } } onClick={ () => {
+                        console.log('clicked!')
+                    } }/></Label>
                 </Card.Header>
-                <Card.Meta>{ props.person.role }</Card.Meta>
+                <Card.Meta>{ value.role }</Card.Meta>
+            </Card.Content>
+            <Card.Content>
+                <Header size="tiny">無法參與排班時間</Header>
             </Card.Content>
         </Card>
     );
@@ -58,26 +73,18 @@ const PersonEdit: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = pro
     };
 
     return (
-        <Card as="section" fluid>
-            <Card.Content>
-                <Card.Header>新增人員</Card.Header>
-            </Card.Content>
-            <Card.Content>
-                <Form onSubmit={ addPerson }>
-                    <Form.Group inline>
-                        <Form.Input label="姓名" placeholder="請輸入姓名" required value={ name }
-                                    onChange={ setName }/>
-                        <Form.Select label="性別" placeholder="請選擇性別" required options={ genderOptions }
-                                     onChange={ setGender }/>
-                        <Form.Select label="身份" placeholder="請選擇身份" required options={ roleOptions }
-                                     onChange={ setRole }/>
-                    </Form.Group>
-                    <Form.Group inline style={ { justifyContent: "flex-end" } }>
-                        <Form.Button positive>新增</Form.Button>
-                    </Form.Group>
-                </Form>
-            </Card.Content>
-        </Card>
+        <Form onSubmit={ addPerson }>
+            <Form.Group inline style={ { justifyContent: "flex-end" } }>
+                <label>加入</label>
+                <Form.Input placeholder="請輸入姓名" required value={ name }
+                            onChange={ setName }/>
+                <Form.Select placeholder="請選擇性別" compact required options={ genderOptions }
+                             onChange={ setGender }/>
+                <Form.Select placeholder="請選擇身份" compact required options={ roleOptions }
+                             onChange={ setRole }/>
+                <Form.Button positive>新增人員</Form.Button>
+            </Form.Group>
+        </Form>
     );
 };
 
@@ -166,26 +173,38 @@ const RepeatedSchedulesEdit: React.FC<RepeatedSchedulesEditProps> = ({ year, mon
 };
 
 type RepeatedScheduleAddProps = {
-    year: number,
-    month: number,
+    forceType?: keyof typeof Type,
     onSubmit?: Dispatch<SetStateAction<RepeatedSchedule>>
-}
-const RepeatedScheduleAdd: React.FC<RepeatedScheduleAddProps> = ({ year, month, onSubmit = Function.prototype }) => {
+} & BasicProps;
+const RepeatedScheduleAdd: React.FC<RepeatedScheduleAddProps> = ({ year, month, forceType, onSubmit = Function.prototype }) => {
     const repeatTypeOptions = Object.keys(RepeatType).map(key => {
         return { key: key, text: RepeatType[key as keyof typeof RepeatType], value: key }
     });
-    const typeOptions = Object.keys(Type).map(key => {
-        return { key: key, text: Type[key as keyof typeof Type], value: key }
-    });
-
     const [repeatTypeKey, _setRepeatTypeKey] = useState<keyof typeof RepeatType>();
     const setRepeatTypeKeyOnChange = (event: SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
         _setRepeatTypeKey(data.value as keyof typeof RepeatType)
     };
-    const [typeKey, _setTypeKey] = useState<keyof typeof Type>();
+
+    const typeOptions = Object.keys(Type).map(key => {
+        return { key: key, text: Type[key as keyof typeof Type], value: key }
+    });
+    let [typeKey, _setTypeKey] = useState<keyof typeof Type>();
     const setTypeKeyOnChange = (event: SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
         _setTypeKey(data.value as keyof typeof Type)
     };
+    let typeChooser: ReactNode = (
+        <>
+            <label>要</label>
+            <Form.Select compact key="type" placeholder="請選擇工作" options={ typeOptions }
+                         value={ typeKey }
+                         onChange={ setTypeKeyOnChange }/>
+        </>
+    );
+    if (forceType) {
+        typeKey = forceType;
+        typeChooser = null;
+    }
+
     const [repeat, setRepeat] = useState<Repeat>();
 
     const submitRepeatedSchedule = () => {
@@ -205,11 +224,8 @@ const RepeatedScheduleAdd: React.FC<RepeatedScheduleAddProps> = ({ year, month, 
                                             repeatType={ repeatTypeKey ? RepeatType[repeatTypeKey] : undefined }
                                             value={ repeat }
                                             onChange={ r => setRepeat(r) }/>
-                <label>要</label>
-                <Form.Select compact key="type" placeholder="請選擇工作" options={ typeOptions }
-                             value={ typeKey }
-                             onChange={ setTypeKeyOnChange }/>
-                <Form.Button positive>新增</Form.Button>
+                { typeChooser }
+                <Form.Button positive>新增班次</Form.Button>
             </Form.Group>
         </Form>
     );
@@ -417,7 +433,7 @@ const App: React.FC = () => {
             </Segment>
             <Segment as="section" basic>
                 <Header as="h2">參與者</Header>
-                <PersonDisplay person={ person }/>
+                <PersonScheduleEdit year={ year } month={ month } value={ person }/>
                 <PersonEdit onSubmit={ setPerson }/>
             </Segment>
         </Container>
