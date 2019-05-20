@@ -26,28 +26,40 @@ type BasicProps = {
 }
 
 type PersonScheduleEditProps = {
-    value: Person,
+    value: Person[],
+    onChange?: Dispatch<SetStateAction<Person[]>>,
 } & BasicProps;
-const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, value }) => {
+const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, value, onChange = Function.prototype }) => {
+    const children = value.map((person, idx) => {
+        const deletePerson = () => {
+            const newValue = value.slice();
+            newValue.splice(idx, 1);
+            onChange(newValue)
+        };
+        return (
+            <Card key={ person.name } as="section" fluid>
+                <Card.Content>
+                    <Card.Header>{ person.name }
+                        <small style={ { padding: '0.5em' } }>({ person.gender })</small>
+                        <Label corner="right"><Icon name="delete" style={ { cursor: "pointer" } }
+                                                    onClick={ deletePerson }/></Label>
+                    </Card.Header>
+                    <Card.Meta>{ person.role }</Card.Meta>
+                </Card.Content>
+                <Card.Content>
+                    <Header size="tiny">無法參與排班時間</Header>
+                </Card.Content>
+            </Card>
+        );
+    });
     return (
-        <Card as="section" fluid>
-            <Card.Content>
-                <Card.Header>{ value.name }
-                    <small style={ { padding: '0.5em' } }>({ value.gender })</small>
-                    <Label corner="right"><Icon name="delete" style={ { cursor: "pointer" } } onClick={ () => {
-                        console.log('clicked!')
-                    } }/></Label>
-                </Card.Header>
-                <Card.Meta>{ value.role }</Card.Meta>
-            </Card.Content>
-            <Card.Content>
-                <Header size="tiny">無法參與排班時間</Header>
-            </Card.Content>
-        </Card>
-    );
+        <>
+            { children }
+            <PersonAdd onSubmit={ newPerson => onChange([...value, newPerson]) }/>
+        </>);
 };
 
-const PersonEdit: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = props => {
+const PersonAdd: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = ({ onSubmit }) => {
     const roleOptions = Object.keys(Role).map(role => {
         return { key: role, text: Role[role as keyof typeof Role], value: role }
     });
@@ -68,7 +80,7 @@ const PersonEdit: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = pro
     };
     const addPerson = () => {
         if (store.name && store.role && store.gender) {
-            props.onSubmit(new Person(store.name, store.role, store.gender));
+            onSubmit(new Person(store.name, store.role, store.gender));
         }
     };
 
@@ -372,7 +384,10 @@ const YearMonthChooser: React.FC<YearMonthChooseProps> = ({ year, month, setYear
     )
 };
 
-const defaultPerson: Person = new Person('王小明', Role.AssistantChiefResident, Gender.Male);
+const defaultPersons: Person[] = [
+    new Person('林小美', Role.AssistantChiefResident, Gender.Female),
+    new Person('王小明', Role.Resident, Gender.Male),
+];
 const defaultRepeatedSchedules: RepeatedSchedule[] = [
     new RepeatedSchedule(Type.MorningNote, now.year, now.month + 1, { type: RepeatType.Day, period: Period.Morning }),
     new RepeatedSchedule(Type.MorningSlide, now.year, now.month + 1, { type: RepeatType.Day, period: Period.Morning }),
@@ -406,7 +421,7 @@ const App: React.FC = () => {
         setAccordionState(true);
         _setRepeatedSchedules(value);
     };
-    const [person, setPerson] = useState<Person>(defaultPerson);
+    const [persons, setPersons] = useState<Person[]>(defaultPersons);
 
     return (
         <Container style={ { margin: 20 } }>
@@ -433,8 +448,7 @@ const App: React.FC = () => {
             </Segment>
             <Segment as="section" basic>
                 <Header as="h2">參與者</Header>
-                <PersonScheduleEdit year={ year } month={ month } value={ person }/>
-                <PersonEdit onSubmit={ setPerson }/>
+                <PersonScheduleEdit year={ year } month={ month } value={ persons } onChange={ setPersons }/>
             </Segment>
         </Container>
     );
