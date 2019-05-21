@@ -26,46 +26,63 @@ type BasicProps = {
     year: number,
     month: number,
 }
+type PersonSchedule = [Person, RepeatedSchedule[]]
 
 type PersonScheduleOverviewProps = {
-    value: Person[],
-    onChange?: Dispatch<Person[]>,
+    value: PersonSchedule[],
+    onChange?: Dispatch<PersonSchedule[]>,
 } & BasicProps;
 const PersonScheduleOverview: React.FC<PersonScheduleOverviewProps> = ({ year, month, value, onChange = noop }) => {
-    const children = value.map((person, idx) => {
+    const children = value.map(([person, repeatedSchedules], idx) => {
         const deletePerson = () => {
             const newValue = value.slice();
             newValue.splice(idx, 1);
-            onChange(newValue)
+            onChange(newValue);
+        };
+        const updatePerson: Dispatch<PersonSchedule> = ([newPerson, newRepeatedSchedules]) => {
+            const newValue = value.slice();
+            newValue.splice(idx, 1, [newPerson, newRepeatedSchedules]);
+            onChange(newValue);
         };
         return (
             <PersonScheduleEdit key={ person.name } year={ year } month={ month } person={ person }
+                                occupiedSchedules={ repeatedSchedules }
+                                onChange={ updatePerson }
                                 onDelete={ deletePerson }/>
         );
     });
     return (
         <>
             { children }
-            <PersonAdd onSubmit={ newPerson => onChange([...value, newPerson]) }/>
+            <PersonAdd onSubmit={ newPerson => onChange([...value, [newPerson, []]]) }/>
         </>);
 };
 
 type PersonScheduleEditProps = {
     person: Person,
+    occupiedSchedules: RepeatedSchedule[],
+    onChange?: Dispatch<PersonSchedule>,
     onDelete?: () => void,
 } & BasicProps;
-const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, person, onDelete = noop }) => {
-    const [occupiedSchedules, setOccupiedSchedules] = useState<RepeatedSchedule[]>([]);
-    const newOccupiedSchedule = (value: RepeatedSchedule) => {
+const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, person, occupiedSchedules, onChange = noop, onDelete = noop }) => {
+    const setOccupiedSchedules: Dispatch<RepeatedSchedule[]> = newOccupiedSchedules => {
+        onChange([person, newOccupiedSchedules]);
+    };
+    const newOccupiedSchedule: Dispatch<RepeatedSchedule> = (value: RepeatedSchedule) => {
         setOccupiedSchedules([...occupiedSchedules, value])
     };
 
-    const schedulesItem = occupiedSchedules.map(repeatedSchedule => {
+    const schedulesItem = occupiedSchedules.map((repeatedSchedule, idx) => {
         const repeatStr: string = Object.values(repeatedSchedule.repeat).join(' ');
+        const deleteSchedule = () => {
+            const newOccupiedSchedules = occupiedSchedules.slice();
+            newOccupiedSchedules.splice(idx, 1);
+            setOccupiedSchedules(newOccupiedSchedules)
+        };
         return (
             <List.Item key={ repeatStr }>
                 { repeatStr }
-                <Icon name="delete" style={ {cursor: "pointer", paddingLeft: "0.4em"}}/>
+                <Icon name="delete" onClick={ deleteSchedule } style={ { cursor: "pointer", paddingLeft: "0.4em" } }/>
             </List.Item>
         );
     });
@@ -418,9 +435,9 @@ const YearMonthChooser: React.FC<YearMonthChooseProps> = ({ year, month, setYear
     )
 };
 
-const defaultPersons: Person[] = [
-    new Person('孫小美', Role.AssistantChiefResident, Gender.Female),
-    new Person('王小明', Role.Resident, Gender.Male),
+const defaultPersonSchedules: PersonSchedule[] = [
+    [new Person('孫小美', Role.AssistantChiefResident, Gender.Female), []],
+    [new Person('王小明', Role.Resident, Gender.Male), []],
 ];
 const defaultRepeatedSchedules: RepeatedSchedule[] = [
     new RepeatedSchedule(Type.MorningNote, now.year, now.month + 1, { type: RepeatType.Day, period: Period.Morning }),
@@ -455,7 +472,7 @@ const App: React.FC = () => {
         setAccordionState(true);
         _setRepeatedSchedules(value);
     };
-    const [persons, setPersons] = useState<Person[]>(defaultPersons);
+    const [personSchedules, setPersonSchedules] = useState<PersonSchedule[]>(defaultPersonSchedules);
 
     return (
         <Container style={ { margin: 20 } }>
@@ -482,7 +499,8 @@ const App: React.FC = () => {
             </Segment>
             <Segment as="section" basic>
                 <Header as="h2">參與者</Header>
-                <PersonScheduleOverview year={ year } month={ month } value={ persons } onChange={ setPersons }/>
+                <PersonScheduleOverview year={ year } month={ month } value={ personSchedules }
+                                        onChange={ setPersonSchedules }/>
             </Segment>
         </Container>
     );
