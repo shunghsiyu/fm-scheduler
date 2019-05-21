@@ -3,7 +3,8 @@ import {
     Accordion,
     Button,
     Card,
-    Container, Divider,
+    Container,
+    Divider,
     DropdownProps,
     Form,
     Grid,
@@ -467,14 +468,34 @@ const App: React.FC = () => {
     const [repeatedSchedules, _setRepeatedSchedules] = useState<RepeatedSchedule[]>(defaultRepeatedSchedules);
     const [emptySchedules, setEmptySchedules] = useState<Schedule[]>(defaultSchedules);
     const [accordionState, setAccordionState] = useState<boolean>(false);
-    const setRepeatedSchedules: Dispatch<RepeatedSchedule[]> = value => {
-        const schedules = (value as RepeatedSchedule[]).flatMap(r => r.toSchedules()).sort((a, b) => a.comparesTo(b));
+    const setRepeatedSchedules: Dispatch<RepeatedSchedule[]> = newRepeatedSchedules => {
+        const schedules = newRepeatedSchedules.flatMap(r => r.toSchedules()).sort((a, b) => a.comparesTo(b));
         setEmptySchedules(schedules);
         setAccordionState(true);
-        _setRepeatedSchedules(value);
+        _setRepeatedSchedules(newRepeatedSchedules);
     };
     const [personSchedules, setPersonSchedules] = useState<PersonSchedule[]>(defaultPersonSchedules);
-    const segmentStyle = { paddingBottom: "4em"};
+    const segmentStyle = { paddingBottom: "4em" };
+
+    const generateOutput = () => {
+        const persons: Person[] = [];
+        const allSchedules: Schedule[] = personSchedules.flatMap(([person, repeatedSchedules]) => {
+            persons.push(person);
+            return repeatedSchedules.flatMap(repeatedSchedule => {
+                const newRepeatedSchedule = Object.create(repeatedSchedule);
+                Object.assign(newRepeatedSchedule, repeatedSchedule);
+                newRepeatedSchedule.assignee = person;
+                return newRepeatedSchedule.toSchedules()
+            })
+        }).concat(emptySchedules);
+        const output = { schedules: allSchedules, persons };
+        return JSON.stringify(output, function (key, value) {
+            if (key === 'assignee' && value instanceof Person) {
+                return value.name;
+            }
+            return value;
+        });
+    };
     return (
         <Container style={ { margin: 20 } }>
             <Segment as="section" basic style={ segmentStyle }>
@@ -513,10 +534,7 @@ const App: React.FC = () => {
                     <Grid.Column width={ 4 }/>
                     <Grid.Column width={ 8 }>
                         <Button positive fluid size="huge"
-                                onClick={ () => console.log(personSchedules.flatMap(([person, repeatedSchedules]) => {
-                                    repeatedSchedules.map(r => r.assignee = person);
-                                    return repeatedSchedules.flatMap(r => r.toSchedules())
-                                })) }>自動排班</Button>
+                                onClick={ () => console.log(generateOutput()) }>自動排班</Button>
                     </Grid.Column>
                     <Grid.Column width={ 4 }/>
                 </Grid>
