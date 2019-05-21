@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Dispatch, ReactNode, SetStateAction, SyntheticEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, Dispatch, ReactNode, SyntheticEvent, useEffect, useState } from 'react';
 import {
     Accordion,
     Button,
@@ -27,7 +27,7 @@ type BasicProps = {
 
 type PersonScheduleOverviewProps = {
     value: Person[],
-    onChange?: Dispatch<SetStateAction<Person[]>>,
+    onChange?: Dispatch<Person[]>,
 } & BasicProps;
 const PersonScheduleOverview: React.FC<PersonScheduleOverviewProps> = ({ year, month, value, onChange = Function.prototype }) => {
     const children = value.map((person, idx) => {
@@ -37,7 +37,8 @@ const PersonScheduleOverview: React.FC<PersonScheduleOverviewProps> = ({ year, m
             onChange(newValue)
         };
         return (
-            <PersonScheduleEdit key={ person.name } year={ year } month={ month } person={ person } onDelete={ deletePerson }/>
+            <PersonScheduleEdit key={ person.name } year={ year } month={ month } person={ person }
+                                onDelete={ deletePerson }/>
         );
     });
     return (
@@ -52,6 +53,10 @@ type PersonScheduleEditProps = {
     onDelete?: () => void,
 } & BasicProps;
 const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, person, onDelete = Function.prototype }) => {
+    const [occupiedSchedules, setOccupiedSchedules] = useState<RepeatedSchedule[]>([]);
+    const newOccupiedSchedule = (value: RepeatedSchedule) => {
+        setOccupiedSchedules([...occupiedSchedules, value])
+    };
     return (
         <Card as="section" fluid>
             <Card.Content>
@@ -65,13 +70,13 @@ const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, pe
             <Card.Content>
                 <Header size="tiny">不能排班時間</Header>
                 <RepeatedScheduleAdd year={ year } month={ month } forceType={ "Other" } positiveButton={ false }
-                                     submitText="新增時間"/>
+                                     submitText="新增時間" onSubmit={ newOccupiedSchedule }/>
             </Card.Content>
         </Card>
     )
 };
 
-const PersonAdd: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = ({ onSubmit }) => {
+const PersonAdd: React.FC<{ onSubmit: Dispatch<Person> }> = ({ onSubmit }) => {
     const roleOptions = Object.keys(Role).map(role => {
         return { key: role, text: Role[role as keyof typeof Role], value: role }
     });
@@ -112,7 +117,7 @@ const PersonAdd: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = ({ o
     );
 };
 
-const ScheduleEdit: React.FC<{ value: Schedule[], onChange: Dispatch<SetStateAction<Schedule[]>> }> = ({ onChange, value }) => {
+const ScheduleEdit: React.FC<{ value: Schedule[], onChange: Dispatch<Schedule[]> }> = ({ onChange, value }) => {
     const tableRows = value.map((schedule, idx) => {
         const { type, time } = schedule;
         const deleteSchedule = (): void => {
@@ -151,7 +156,7 @@ type RepeatedSchedulesEditProps = {
     year: number,
     month: number,
     value: RepeatedSchedule[],
-    onChange?: Dispatch<SetStateAction<RepeatedSchedule[]>>,
+    onChange?: Dispatch<RepeatedSchedule[]>,
 }
 const RepeatedSchedulesEdit: React.FC<RepeatedSchedulesEditProps> = ({ year, month, value, onChange = Function.prototype }) => {
     const tableRows = value.map((repeatedSchedule, idx) => {
@@ -200,9 +205,11 @@ type RepeatedScheduleAddProps = {
     forceType?: keyof typeof Type,
     submitText?: string,
     positiveButton?: boolean,
-    onSubmit?: Dispatch<SetStateAction<RepeatedSchedule>>,
+    onSubmit?: Dispatch<RepeatedSchedule>,
 } & BasicProps;
-const RepeatedScheduleAdd: React.FC<RepeatedScheduleAddProps> = ({ year, month, forceType, positiveButton = true, submitText = "新增班次", onSubmit = Function.prototype }) => {
+const RepeatedScheduleAdd: React.FC<RepeatedScheduleAddProps> = (
+    { year, month, forceType, positiveButton = true, submitText = "新增班次", onSubmit = Function.prototype }
+) => {
     const repeatTypeOptions = Object.keys(RepeatType).map(key => {
         return { key: key, text: RepeatType[key as keyof typeof RepeatType], value: key }
     });
@@ -378,7 +385,7 @@ const monthOptions = Array(12).fill(1).map((_, i) => {
     const month = i + 1;
     return { key: month, text: month.toString(), value: month }
 });
-type YearMonthChooseProps = { year: number, month: number, setYear: Dispatch<SetStateAction<number>>, setMonth: Dispatch<SetStateAction<number>> }
+type YearMonthChooseProps = { year: number, month: number, setYear: Dispatch<number>, setMonth: Dispatch<number> }
 const YearMonthChooser: React.FC<YearMonthChooseProps> = ({ year, month, setYear, setMonth }) => {
     return (
         <Form>
@@ -429,7 +436,7 @@ const App: React.FC = () => {
     const [repeatedSchedules, _setRepeatedSchedules] = useState<RepeatedSchedule[]>(defaultRepeatedSchedules);
     const [emptySchedules, setEmptySchedules] = useState<Schedule[]>(defaultSchedules);
     const [accordionState, setAccordionState] = useState<boolean>(false);
-    const setRepeatedSchedules: Dispatch<SetStateAction<RepeatedSchedule[]>> = value => {
+    const setRepeatedSchedules: Dispatch<RepeatedSchedule[]> = value => {
         const schedules = (value as RepeatedSchedule[]).flatMap(r => r.toSchedules()).sort((a, b) => a.comparesTo(b));
         setEmptySchedules(schedules);
         setAccordionState(true);
