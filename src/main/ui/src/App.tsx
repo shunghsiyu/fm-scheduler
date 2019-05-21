@@ -20,6 +20,7 @@ import Schedule, { RepeatedSchedule, Type } from "./Schedule"
 import { Period, Repeat, RepeatType, WeekDay, weekDayMapping, workingDays } from "./Time"
 import isEqual from "lodash.isequal"
 import { DateTime } from "luxon";
+import { noop } from "./util";
 
 type BasicProps = {
     year: number,
@@ -30,7 +31,7 @@ type PersonScheduleOverviewProps = {
     value: Person[],
     onChange?: Dispatch<Person[]>,
 } & BasicProps;
-const PersonScheduleOverview: React.FC<PersonScheduleOverviewProps> = ({ year, month, value, onChange = Function.prototype }) => {
+const PersonScheduleOverview: React.FC<PersonScheduleOverviewProps> = ({ year, month, value, onChange = noop }) => {
     const children = value.map((person, idx) => {
         const deletePerson = () => {
             const newValue = value.slice();
@@ -53,7 +54,7 @@ type PersonScheduleEditProps = {
     person: Person,
     onDelete?: () => void,
 } & BasicProps;
-const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, person, onDelete = Function.prototype }) => {
+const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, person, onDelete = noop }) => {
     const [occupiedSchedules, setOccupiedSchedules] = useState<RepeatedSchedule[]>([]);
     const newOccupiedSchedule = (value: RepeatedSchedule) => {
         setOccupiedSchedules([...occupiedSchedules, value])
@@ -170,7 +171,7 @@ type RepeatedSchedulesEditProps = {
     value: RepeatedSchedule[],
     onChange?: Dispatch<RepeatedSchedule[]>,
 }
-const RepeatedSchedulesEdit: React.FC<RepeatedSchedulesEditProps> = ({ year, month, value, onChange = Function.prototype }) => {
+const RepeatedSchedulesEdit: React.FC<RepeatedSchedulesEditProps> = ({ year, month, value, onChange = noop }) => {
     const tableRows = value.map((repeatedSchedule, idx) => {
         const { type, repeat } = repeatedSchedule;
         const deleteRepeatedSchedule = (): void => {
@@ -220,7 +221,7 @@ type RepeatedScheduleAddProps = {
     onSubmit?: Dispatch<RepeatedSchedule>,
 } & BasicProps;
 const RepeatedScheduleAdd: React.FC<RepeatedScheduleAddProps> = (
-    { year, month, forceType, positiveButton = true, submitText = "新增班次", onSubmit = Function.prototype }
+    { year, month, forceType, positiveButton = true, submitText = "新增班次", onSubmit = noop }
 ) => {
     const repeatTypeOptions = Object.keys(RepeatType).map(key => {
         return { key: key, text: RepeatType[key as keyof typeof RepeatType], value: key }
@@ -284,7 +285,7 @@ type RepeatedScheduleDetailEditProps = {
     onChange?: (repeat: Repeat | undefined) => void
 }
 const RepeatedScheduleDetailEdit: React.FC<RepeatedScheduleDetailEditProps> =
-    ({ year, month, repeatType, value, onChange = Function.prototype }) => {
+    ({ year, month, repeatType, value, onChange = noop }) => {
         const periodOptions = Object.keys(Period).map(key => {
             return { key: key, text: Period[key as keyof typeof Period], value: key }
         });
