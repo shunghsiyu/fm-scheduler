@@ -3,9 +3,10 @@ import {
     Accordion,
     Button,
     Card,
-    Container,
+    Container, Divider,
     DropdownProps,
     Form,
+    Grid,
     Header,
     Icon,
     InputOnChangeData,
@@ -473,15 +474,17 @@ const App: React.FC = () => {
         _setRepeatedSchedules(value);
     };
     const [personSchedules, setPersonSchedules] = useState<PersonSchedule[]>(defaultPersonSchedules);
-
+    const segmentStyle = { paddingBottom: "4em"};
     return (
         <Container style={ { margin: 20 } }>
-            <Segment as="section" basic>
+            <Segment as="section" basic style={ segmentStyle }>
                 <Header as="h2">選擇時間</Header>
+                <Divider hidden/>
                 <YearMonthChooser year={ year } month={ month } setYear={ setYear } setMonth={ setMonth }/>
             </Segment>
-            <Segment as="section" basic>
+            <Segment as="section" basic style={ segmentStyle }>
                 <Header as="h2">編輯班次</Header>
+                <Divider hidden/>
                 <RepeatedSchedulesEdit year={ year } month={ month } value={ repeatedSchedules }
                                        onChange={ setRepeatedSchedules }/>
                 <Accordion as="section">
@@ -497,10 +500,26 @@ const App: React.FC = () => {
                     </Accordion.Content>
                 </Accordion>
             </Segment>
-            <Segment as="section" basic>
+            <Segment as="section" basic style={ segmentStyle }>
                 <Header as="h2">參與者</Header>
+                <Divider hidden/>
                 <PersonScheduleOverview year={ year } month={ month } value={ personSchedules }
                                         onChange={ setPersonSchedules }/>
+            </Segment>
+            <Segment as="section" basic style={ segmentStyle }>
+                <Header as="h2">產生班表</Header>
+                <Divider hidden/>
+                <Grid>
+                    <Grid.Column width={ 4 }/>
+                    <Grid.Column width={ 8 }>
+                        <Button positive fluid size="huge"
+                                onClick={ () => console.log(personSchedules.flatMap(([person, repeatedSchedules]) => {
+                                    repeatedSchedules.map(r => r.assignee = person);
+                                    return repeatedSchedules.flatMap(r => r.toSchedules())
+                                })) }>自動排班</Button>
+                    </Grid.Column>
+                    <Grid.Column width={ 4 }/>
+                </Grid>
             </Segment>
         </Container>
     );
