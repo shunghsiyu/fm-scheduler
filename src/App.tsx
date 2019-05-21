@@ -29,7 +29,7 @@ type PersonScheduleEditProps = {
     value: Person[],
     onChange?: Dispatch<SetStateAction<Person[]>>,
 } & BasicProps;
-const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, value, onChange = Function.prototype }) => {
+const PersonScheduleOverview: React.FC<PersonScheduleEditProps> = ({ year, month, value, onChange = Function.prototype }) => {
     const children = value.map((person, idx) => {
         const deletePerson = () => {
             const newValue = value.slice();
@@ -37,19 +37,7 @@ const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, va
             onChange(newValue)
         };
         return (
-            <Card key={ person.name } as="section" fluid>
-                <Card.Content>
-                    <Card.Header>{ person.name }
-                        <small style={ { padding: '0.5em' } }>({ person.gender })</small>
-                        <Label corner="right"><Icon name="delete" style={ { cursor: "pointer" } }
-                                                    onClick={ deletePerson }/></Label>
-                    </Card.Header>
-                    <Card.Meta>{ person.role }</Card.Meta>
-                </Card.Content>
-                <Card.Content>
-                    <Header size="tiny">無法參與排班時間</Header>
-                </Card.Content>
-            </Card>
+            <PersonScheduleEdit key={ person.name } year={ year } month={ month } person={ person } onDelete={ deletePerson }/>
         );
     });
     return (
@@ -57,6 +45,30 @@ const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, va
             { children }
             <PersonAdd onSubmit={ newPerson => onChange([...value, newPerson]) }/>
         </>);
+};
+
+type PersonScheduleDetailEditProps = {
+    person: Person,
+    onDelete?: () => void,
+} & BasicProps;
+const PersonScheduleEdit: React.FC<PersonScheduleDetailEditProps> = ({ year, month, person, onDelete = Function.prototype }) => {
+    return (
+        <Card as="section" fluid>
+            <Card.Content>
+                <Card.Header>{ person.name }
+                    <small style={ { padding: '0.5em' } }>({ person.gender })</small>
+                    <Label corner="right"><Icon name="delete" style={ { cursor: "pointer" } }
+                                                onClick={ onDelete }/></Label>
+                </Card.Header>
+                <Card.Meta>{ person.role }</Card.Meta>
+            </Card.Content>
+            <Card.Content>
+                <Header size="tiny">不能排班時間</Header>
+                <RepeatedScheduleAdd year={ year } month={ month } forceType={ "Other" } positiveButton={ false }
+                                     submitText="新增時間"/>
+            </Card.Content>
+        </Card>
+    )
 };
 
 const PersonAdd: React.FC<{ onSubmit: Dispatch<SetStateAction<Person>> }> = ({ onSubmit }) => {
@@ -186,9 +198,11 @@ const RepeatedSchedulesEdit: React.FC<RepeatedSchedulesEditProps> = ({ year, mon
 
 type RepeatedScheduleAddProps = {
     forceType?: keyof typeof Type,
-    onSubmit?: Dispatch<SetStateAction<RepeatedSchedule>>
+    submitText?: string,
+    positiveButton?: boolean,
+    onSubmit?: Dispatch<SetStateAction<RepeatedSchedule>>,
 } & BasicProps;
-const RepeatedScheduleAdd: React.FC<RepeatedScheduleAddProps> = ({ year, month, forceType, onSubmit = Function.prototype }) => {
+const RepeatedScheduleAdd: React.FC<RepeatedScheduleAddProps> = ({ year, month, forceType, positiveButton = true, submitText = "新增班次", onSubmit = Function.prototype }) => {
     const repeatTypeOptions = Object.keys(RepeatType).map(key => {
         return { key: key, text: RepeatType[key as keyof typeof RepeatType], value: key }
     });
@@ -237,7 +251,7 @@ const RepeatedScheduleAdd: React.FC<RepeatedScheduleAddProps> = ({ year, month, 
                                             value={ repeat }
                                             onChange={ r => setRepeat(r) }/>
                 { typeChooser }
-                <Form.Button positive>新增班次</Form.Button>
+                <Form.Button positive={ positiveButton }>{ submitText }</Form.Button>
             </Form.Group>
         </Form>
     );
@@ -413,11 +427,11 @@ const App: React.FC = () => {
     const [year, setYear] = useState<number>(now.year);
     const [month, setMonth] = useState<number>((now.plus({ month: 1 })).month);
     const [repeatedSchedules, _setRepeatedSchedules] = useState<RepeatedSchedule[]>(defaultRepeatedSchedules);
-    const [schedules, setSchedules] = useState<Schedule[]>(defaultSchedules);
+    const [emptySchedules, setEmptySchedules] = useState<Schedule[]>(defaultSchedules);
     const [accordionState, setAccordionState] = useState<boolean>(false);
     const setRepeatedSchedules: Dispatch<SetStateAction<RepeatedSchedule[]>> = value => {
         const schedules = (value as RepeatedSchedule[]).flatMap(r => r.toSchedules()).sort((a, b) => a.comparesTo(b));
-        setSchedules(schedules);
+        setEmptySchedules(schedules);
         setAccordionState(true);
         _setRepeatedSchedules(value);
     };
@@ -442,13 +456,13 @@ const App: React.FC = () => {
                     </Accordion.Title>
                     <Accordion.Content active={ accordionState }>
                         <p>編輯上方班次後，下面詳細班次將會重置</p>
-                        <ScheduleEdit value={ schedules } onChange={ setSchedules }/>
+                        <ScheduleEdit value={ emptySchedules } onChange={ setEmptySchedules }/>
                     </Accordion.Content>
                 </Accordion>
             </Segment>
             <Segment as="section" basic>
                 <Header as="h2">參與者</Header>
-                <PersonScheduleEdit year={ year } month={ month } value={ persons } onChange={ setPersons }/>
+                <PersonScheduleOverview year={ year } month={ month } value={ persons } onChange={ setPersons }/>
             </Segment>
         </Container>
     );
