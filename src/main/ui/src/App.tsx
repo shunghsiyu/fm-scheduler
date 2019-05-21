@@ -25,11 +25,11 @@ type BasicProps = {
     month: number,
 }
 
-type PersonScheduleEditProps = {
+type PersonScheduleOverviewProps = {
     value: Person[],
     onChange?: Dispatch<SetStateAction<Person[]>>,
 } & BasicProps;
-const PersonScheduleOverview: React.FC<PersonScheduleEditProps> = ({ year, month, value, onChange = Function.prototype }) => {
+const PersonScheduleOverview: React.FC<PersonScheduleOverviewProps> = ({ year, month, value, onChange = Function.prototype }) => {
     const children = value.map((person, idx) => {
         const deletePerson = () => {
             const newValue = value.slice();
@@ -47,11 +47,11 @@ const PersonScheduleOverview: React.FC<PersonScheduleEditProps> = ({ year, month
         </>);
 };
 
-type PersonScheduleDetailEditProps = {
+type PersonScheduleEditProps = {
     person: Person,
     onDelete?: () => void,
 } & BasicProps;
-const PersonScheduleEdit: React.FC<PersonScheduleDetailEditProps> = ({ year, month, person, onDelete = Function.prototype }) => {
+const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, person, onDelete = Function.prototype }) => {
     return (
         <Card as="section" fluid>
             <Card.Content>
