@@ -10,6 +10,7 @@ import {
     Icon,
     InputOnChangeData,
     Label,
+    List,
     Segment,
     Table
 } from 'semantic-ui-react'
@@ -57,6 +58,16 @@ const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, pe
     const newOccupiedSchedule = (value: RepeatedSchedule) => {
         setOccupiedSchedules([...occupiedSchedules, value])
     };
+
+    const schedulesItem = occupiedSchedules.map(repeatedSchedule => {
+        const repeatStr: string = Object.values(repeatedSchedule.repeat).join(' ');
+        return (
+            <List.Item key={ repeatStr }>
+                { repeatStr }
+                <Icon name="delete" style={ {cursor: "pointer", paddingLeft: "0.4em"}}/>
+            </List.Item>
+        );
+    });
     return (
         <Card as="section" fluid>
             <Card.Content>
@@ -69,6 +80,7 @@ const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, pe
             </Card.Content>
             <Card.Content>
                 <Header size="tiny">不能排班時間</Header>
+                <List style={ { margin: "0 1em" } }>{ schedulesItem }</List>
                 <RepeatedScheduleAdd year={ year } month={ month } forceType={ "Other" } positiveButton={ false }
                                      submitText="新增時間" onSubmit={ newOccupiedSchedule }/>
             </Card.Content>
@@ -406,7 +418,7 @@ const YearMonthChooser: React.FC<YearMonthChooseProps> = ({ year, month, setYear
 };
 
 const defaultPersons: Person[] = [
-    new Person('林小美', Role.AssistantChiefResident, Gender.Female),
+    new Person('孫小美', Role.AssistantChiefResident, Gender.Female),
     new Person('王小明', Role.Resident, Gender.Male),
 ];
 const defaultRepeatedSchedules: RepeatedSchedule[] = [
