@@ -83,7 +83,7 @@ rule "每一個一般R人力儘量一個月內有 3 次排班的項目是晨會�
             $total : count($assignment)
         )
     then
-        scoreHolder.addSoftConstraintMatch(kcontext, -pow3($total.intValue() - 3));
+        scoreHolder.addSoftConstraintMatch(kcontext, -2 * pow3($total.intValue() - 3));
 end
 
 rule "每一個人力儘量一個月內有 3 次排班的項目是晨會記錄或科會記錄"
@@ -94,7 +94,7 @@ rule "每一個人力儘量一個月內有 3 次排班的項目是晨會記錄�
             $total : count($assignment)
         )
     then
-        scoreHolder.addSoftConstraintMatch(kcontext, -(2 * (pow3($total.intValue() - 3))));
+        scoreHolder.addSoftConstraintMatch(kcontext, -2 * pow3($total.intValue() - 3));
 end
 
 rule "每一個人力儘量一個月內有 1 次排班的項目是景福講座"
@@ -112,7 +112,7 @@ rule "每一個人力在同一天儘量不要上午下午都被排班"
     when
         $person : Person()
         Schedule($localDate : time.localDate, $id : id, type != Type.OTHER, assignee == $person)
-        Schedule(time.localDate == $localDate, assignee == $person, id > $id)
+        Schedule(time.localDate == $localDate, type != Type.OTHER, assignee == $person, id > $id)
     then
         scoreHolder.addSoftConstraintMatch(kcontext, -1);
 end
@@ -121,7 +121,7 @@ rule "每一個人力在同一天儘量不要上午下午都被排班 - 門診"
     when
         $person : Person()
         Schedule($localDate : time.localDate, $id : id, type != Type.OTHER, assignee == $person)
-        Schedule(time.localDate == $localDate) from $person.getSchedules()
+        Schedule(time.localDate == $localDate, type != Type.OTHER) from $person.getSchedules()
     then
         scoreHolder.addSoftConstraintMatch(kcontext, -1);
 end
@@ -133,3 +133,15 @@ rule "同一天內項目爲抹片的排班希望至少有一個人力是女生"
     then
         scoreHolder.addSoftConstraintMatch(kcontext, -1);
 end
+
+rule "每一個一般R人力儘量一個月內有 8 次排班"
+    when
+        $person : Person(role == Role.NORMAL)
+        accumulate(
+            $assignment : Schedule(assignee == $person, type != Type.OTHER),
+            $total : count($assignment)
+        )
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext, -pow2($total.intValue() - 8));
+end
+
