@@ -1,14 +1,15 @@
 package com.baeldung.optaplanner;
 
-import java.time.DayOfWeek;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
+import java.time.DayOfWeek;
+
 @PlanningEntity
 @EqualsAndHashCode
-@ToString(includeFieldNames = true)
+@ToString
 public class Schedule implements Comparable<Schedule> {
 
     public enum Type {
@@ -100,7 +101,7 @@ public class Schedule implements Comparable<Schedule> {
         return new Schedule(Type.OPD, time, assignee);
     }
 
-    public static Schedule Other(Time time) {
+    static Schedule Other(Time time) {
         return new Schedule(Type.OTHER, time, null);
     }
 

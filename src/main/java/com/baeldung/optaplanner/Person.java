@@ -1,18 +1,18 @@
 package com.baeldung.optaplanner;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-
 @EqualsAndHashCode
-@ToString(includeFieldNames = true)
+@ToString
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "name")
@@ -60,18 +60,18 @@ public class Person {
         return person;
     }
 
-    public Person addSchedule(Schedule sched) {
+    Person addSchedule(Schedule sched) {
         sched.setAssignee(this);
         this.schedules.add(sched);
         return this;
     }
 
-    public Person addOPDSchedule(
+    Person addOPDSchedule(
             Integer opdYear, Integer opdMonth, DayOfWeek opdDayOfWeek, Time.Period opdPeriod) {
         return this.addOPDSchedule(opdYear, opdMonth, opdDayOfWeek, opdPeriod, null);
     }
 
-    public Person addOPDSchedule(
+    Person addOPDSchedule(
             Integer opdYear,
             Integer opdMonth,
             DayOfWeek opdDayOfWeek,
@@ -98,7 +98,7 @@ public class Person {
         for (LocalDate date = baseDate.with(TemporalAdjusters.firstInMonth(opdDayOfWeek));
                 date.getMonthValue() == opdMonth;
                 date = date.plusWeeks(1)) {
-            Integer simpleWeekNum = 1 + (date.getDayOfMonth() - 1) / 7;
+            int simpleWeekNum = 1 + (date.getDayOfMonth() - 1) / 7;
             if (weekNumMod2Remainder != null && (simpleWeekNum % 2) != weekNumMod2Remainder) {
                 continue;
             }
@@ -115,7 +115,7 @@ public class Person {
         return this.gender;
     }
 
-    public List<Schedule> getSchedules() {
+    List<Schedule> getSchedules() {
         return this.schedules;
     }
 
@@ -123,7 +123,7 @@ public class Person {
         return this.role;
     }
 
-    public void setRole(Role role) {
+    void setRole(Role role) {
         this.role = role;
     }
 }
