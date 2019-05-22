@@ -24,7 +24,8 @@ public class Schedule implements Comparable<Schedule> {
 
     private Type type;
     private Time time;
-    @EqualsAndHashCode.Exclude private Person assignee;
+    @EqualsAndHashCode.Exclude
+    private Person assignee;
 
     public Schedule() {
         this.type = null;
