@@ -97,9 +97,9 @@ rule "每一個人力儘量一個月內有 3 次排班的項目是晨會記錄�
         scoreHolder.addSoftConstraintMatch(kcontext, -2 * pow3($total.intValue() - 3));
 end
 
-rule "每一個人力儘量一個月內有 1 次排班的項目是景福講座"
+rule "每一個一般R人力儘量一個月內有 1 次排班的項目是景福講座"
     when
-        $person : Person()
+        $person : Person(role == Role.NORMAL)
         accumulate(
             $assignment : Schedule(assignee == $person, type == Type.JINGFUMEETING),
             $total : count($assignment)
