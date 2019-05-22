@@ -56,7 +56,7 @@ public class Person {
             Time.Period opdPeriod) {
         Person person = new Person(name, gender, new ArrayList<>());
         person.schedules =
-                person.generateOPDSchedule(opdYear, opdMonth, opdDayOfWeek, opdPeriod, null);
+                person.generateSchedules(Schedule.Type.OPD, opdYear, opdMonth, opdDayOfWeek, opdPeriod, null);
         return person;
     }
 
@@ -66,43 +66,56 @@ public class Person {
         return this;
     }
 
-    Person addOPDSchedule(
+    Person addOtherSchedules(
             Integer opdYear, Integer opdMonth, DayOfWeek opdDayOfWeek, Time.Period opdPeriod) {
-        return this.addOPDSchedule(opdYear, opdMonth, opdDayOfWeek, opdPeriod, null);
+        return this.addOPDSchedules(opdYear, opdMonth, opdDayOfWeek, opdPeriod, null);
     }
 
-    Person addOPDSchedule(
+    Person addOtherSchedules(
             Integer opdYear,
             Integer opdMonth,
             DayOfWeek opdDayOfWeek,
             Time.Period opdPeriod,
             Integer weekNumMod2Remainder) {
         List<Schedule> additionalSchedules =
-                this.generateOPDSchedule(
-                        opdYear, opdMonth, opdDayOfWeek, opdPeriod, weekNumMod2Remainder);
+                this.generateSchedules(
+                        Schedule.Type.OTHER, opdYear, opdMonth, opdDayOfWeek, opdPeriod, weekNumMod2Remainder);
         this.schedules.addAll(additionalSchedules);
         return this;
     }
 
-    private List<Schedule> generateOPDSchedule(
+    Person addOPDSchedules(
+            Integer opdYear, Integer opdMonth, DayOfWeek opdDayOfWeek, Time.Period opdPeriod) {
+        return this.addOPDSchedules(opdYear, opdMonth, opdDayOfWeek, opdPeriod, null);
+    }
+
+    Person addOPDSchedules(
             Integer opdYear,
             Integer opdMonth,
             DayOfWeek opdDayOfWeek,
             Time.Period opdPeriod,
             Integer weekNumMod2Remainder) {
+        List<Schedule> additionalSchedules =
+                this.generateSchedules(
+                        Schedule.Type.OPD, opdYear, opdMonth, opdDayOfWeek, opdPeriod, weekNumMod2Remainder);
+        this.schedules.addAll(additionalSchedules);
+        return this;
+    }
+
+    private List<Schedule> generateSchedules(Schedule.Type type, Integer opdYear, Integer opdMonth, DayOfWeek opdDayOfWeek, Time.Period opdPeriod, Integer weekNumMod2Remainder) {
         List<Schedule> list = new ArrayList<>();
 
         // Get first DayOfWeek in that month
         LocalDate baseDate = LocalDate.of(opdYear, opdMonth, 1);
 
         for (LocalDate date = baseDate.with(TemporalAdjusters.firstInMonth(opdDayOfWeek));
-                date.getMonthValue() == opdMonth;
-                date = date.plusWeeks(1)) {
+             date.getMonthValue() == opdMonth;
+             date = date.plusWeeks(1)) {
             int simpleWeekNum = 1 + (date.getDayOfMonth() - 1) / 7;
             if (weekNumMod2Remainder != null && (simpleWeekNum % 2) != weekNumMod2Remainder) {
                 continue;
             }
-            list.add(Schedule.OPD(new Time(date, opdPeriod), this));
+            list.add(new Schedule(type, new Time(date, opdPeriod), this));
         }
         return list;
     }
