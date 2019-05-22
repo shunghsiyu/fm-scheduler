@@ -1,5 +1,6 @@
 package com.baeldung.optaplanner;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
@@ -132,6 +133,7 @@ public class Schedule implements Comparable<Schedule> {
         }
     }
 
+    @JsonIgnore
     public int getId() {
         return System.identityHashCode(this);
     }

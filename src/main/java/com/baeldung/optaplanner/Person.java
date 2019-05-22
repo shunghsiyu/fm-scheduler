@@ -115,7 +115,7 @@ public class Person {
         return this.gender;
     }
 
-    List<Schedule> getSchedules() {
+    public List<Schedule> getSchedules() {
         return this.schedules;
     }
 

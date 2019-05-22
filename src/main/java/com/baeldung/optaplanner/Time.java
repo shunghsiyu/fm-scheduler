@@ -1,9 +1,12 @@
 package com.baeldung.optaplanner;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
@@ -24,11 +27,12 @@ public class Time implements Comparable<Time> {
         }
     }
 
-    private LocalDate date;
+    @JsonSerialize(using = JSONUtil.LocalDateSerializer.class)
+    private LocalDate localDate;
     private Period period;
 
-    public Time(LocalDate date, Period period) {
-        this.date = date;
+    public Time(LocalDate localDate, Period period) {
+        this.localDate = localDate;
         this.period = period;
     }
 
@@ -38,15 +42,17 @@ public class Time implements Comparable<Time> {
     }
 
     public LocalDate getLocalDate() {
-        return this.date;
+        return this.localDate;
     }
 
+    @JsonIgnore
     public Integer getDate() {
-        return this.date.getDayOfMonth();
+        return this.localDate.getDayOfMonth();
     }
 
+    @JsonIgnore
     public DayOfWeek getDayOfWeek() {
-        return this.date.getDayOfWeek();
+        return this.localDate.getDayOfWeek();
     }
 
     public Period getPeriod() {
@@ -55,7 +61,7 @@ public class Time implements Comparable<Time> {
 
     @Override
     public int compareTo(Time other) {
-        int compareDate = this.date.compareTo(other.date);
+        int compareDate = this.localDate.compareTo(other.localDate);
         if (compareDate == 0) {
             return this.period.compareTo(other.period);
         } else {

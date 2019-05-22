@@ -111,8 +111,8 @@ end
 rule "每一個人力在同一天儘量不要上午下午都被排班"
     when
         $person : Person()
-        Schedule($date : time.localDate, $id : id, assignee == $person)
-        Schedule(time.localDate == $date, assignee == $person, id > $id)
+        Schedule($localDate : time.localDate, $id : id, assignee == $person)
+        Schedule(time.localDate == $localDate, assignee == $person, id > $id)
     then
         scoreHolder.addSoftConstraintMatch(kcontext, -10);
 end
@@ -120,16 +120,16 @@ end
 rule "每一個人力在同一天儘量不要上午下午都被排班 - 門診"
     when
         $person : Person()
-        Schedule($date : time.localDate, $id : id, assignee == $person)
-        Schedule(time.localDate == $date) from $person.getSchedules()
+        Schedule($localDate : time.localDate, $id : id, assignee == $person)
+        Schedule(time.localDate == $localDate) from $person.getSchedules()
     then
         scoreHolder.addSoftConstraintMatch(kcontext, -5);
 end
 
 rule "同一天內項目爲抹片的排班希望至少有一個人力是女生"
     when
-        Schedule($date : time.localDate, $id : id, type == Type.PAP, assignee!.gender == Gender.MALE)
-        Schedule(time.localDate == $date, type == Type.PAP, assignee!.gender == Gender.MALE, id > $id)
+        Schedule($localDate : time.localDate, $id : id, type == Type.PAP, assignee!.gender == Gender.MALE)
+        Schedule(time.localDate == $localDate, type == Type.PAP, assignee!.gender == Gender.MALE, id > $id)
     then
         scoreHolder.addSoftConstraintMatch(kcontext, -1);
 end

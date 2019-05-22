@@ -1,7 +1,5 @@
 package com.baeldung.optaplanner;
 
-import java.util.ArrayList;
-import java.util.List;
 import lombok.ToString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,6 +9,9 @@ import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.drools.ProblemFactCollectionProperty;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @PlanningSolution
 @ToString(includeFieldNames = true)
@@ -22,6 +23,8 @@ public class SchedulePlan {
     private List<Person> persons;
     private HardSoftScore score;
 
+    // Empty constructor is required by OptaPlanner
+    @SuppressWarnings("unused")
     public SchedulePlan() {
         this.persons = new ArrayList<>();
         this.schedules = new ArrayList<>();
