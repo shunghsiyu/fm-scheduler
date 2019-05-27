@@ -29,16 +29,16 @@ export enum Period {
 }
 
 export default class Time {
-    date: DateTime;
+    localDate: DateTime;
     period: Period;
 
     constructor(date: DateTime, period: Period) {
-        this.date = date.setLocale('zh-TW');
+        this.localDate = date.setLocale('zh-TW');
         this.period = period;
     }
 
     oddWeek(): boolean {
-        const dayInMonth = this.date.day;
+        const dayInMonth = this.localDate.day;
         const weekNum = Math.floor((dayInMonth - 1) / 7) + 1;
         return (weekNum % 2) === 1;
     }
@@ -48,17 +48,24 @@ export default class Time {
     }
 
     dateStr(): string {
-        const date = this.date;
+        const date = this.localDate;
         const dayOfWeek = date.weekdayShort.slice(1);
         return `${ date.month }/${ date.day } (${ dayOfWeek })`;
     }
 
     comparesTo(another: Time) {
-        let diff = this.date.toMillis() - another.date.toMillis();
+        let diff = this.localDate.toMillis() - another.localDate.toMillis();
         if (diff === 0) {
             diff = another.period.localeCompare(this.period)
         }
         return diff;
+    }
+
+    toJSON(): object {
+        return {
+            localDate: this.localDate.toISODate(),
+            period: this.period,
+        }
     }
 };
 
