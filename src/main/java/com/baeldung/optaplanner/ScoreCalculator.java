@@ -1,9 +1,5 @@
 package com.baeldung.optaplanner;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import lombok.Data;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,15 +7,14 @@ import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.impl.score.director.easy.EasyScoreCalculator;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 public class ScoreCalculator implements EasyScoreCalculator<SchedulePlan> {
 
     Logger logger = LogManager.getLogger();
-
-    @Data
-    public class PersonAtTime {
-        private final Person person;
-        private final Time time;
-    }
 
     @Override
     public Score calculateScore(SchedulePlan plan) {
@@ -29,7 +24,7 @@ public class ScoreCalculator implements EasyScoreCalculator<SchedulePlan> {
         Map<Person, Integer> scheduleCount = new HashMap<>();
         Set<PersonAtTime> occupancy = new HashSet<>();
 
-        for (Person person : plan.getPersonList()) {
+        for (Person person : plan.getPersons()) {
             for (Schedule sched : person.getSchedules()) {
                 Time time = sched.getTime();
                 PersonAtTime occupied = new PersonAtTime(person, time);
@@ -39,7 +34,7 @@ public class ScoreCalculator implements EasyScoreCalculator<SchedulePlan> {
             }
         }
 
-        for (Schedule sched : plan.getScheduleList()) {
+        for (Schedule sched : plan.getSchedules()) {
             Person person = sched.getAssignee();
             Time time = sched.getTime();
             if (person != null) {
@@ -70,6 +65,12 @@ public class ScoreCalculator implements EasyScoreCalculator<SchedulePlan> {
             softScore += -(count * count);
         }
 
-        return HardSoftScore.valueOf(hardScore, softScore);
+        return HardSoftScore.of(hardScore, softScore);
+    }
+
+    @Data
+    private class PersonAtTime {
+        private final Person person;
+        private final Time time;
     }
 }

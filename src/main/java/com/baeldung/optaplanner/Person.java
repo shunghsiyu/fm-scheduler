@@ -1,6 +1,7 @@
 package com.baeldung.optaplanner;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -18,25 +19,25 @@ import java.util.List;
         property = "name")
 public class Person {
 
-    public enum Gender {
-        MALE,
-        FEMALE
-    }
-
-    public enum Role {
-        NORMAL,
-        SCR
-    }
-
     private String name;
-    @EqualsAndHashCode.Exclude private Gender gender;
-    @EqualsAndHashCode.Exclude private Role role;
-    @ToString.Exclude @EqualsAndHashCode.Exclude private List<Schedule> schedules;
+    @EqualsAndHashCode.Exclude
+    private Gender gender;
+    @EqualsAndHashCode.Exclude
+    private Role role;
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Schedule> schedules;
 
-    public Person(String name, Gender gender, List<Schedule> schedules) {
-        this(name, gender, schedules, Role.NORMAL);
+    public Person() {
+        this(null, null, new ArrayList<>());
     }
 
+    @SuppressWarnings("WeakerAccess")
+    public Person(String name, Gender gender, List<Schedule> schedules) {
+        this(name, gender, schedules, Role.Resident);
+    }
+
+    @SuppressWarnings("WeakerAccess")
     public Person(String name, Gender gender, List<Schedule> schedules, Role role) {
         if (schedules == null) {
             throw new IllegalArgumentException("schedules cannot be null");
@@ -45,6 +46,26 @@ public class Person {
         this.gender = gender;
         this.schedules = schedules;
         this.role = role;
+    }
+
+    Person addOtherSchedules(
+            Integer opdYear,
+            Integer opdMonth,
+            DayOfWeek opdDayOfWeek,
+            Time.Period opdPeriod,
+            Integer weekNumMod2Remainder) {
+        List<Schedule> additionalSchedules =
+                this.generateSchedules(
+                        Schedule.Type.Other, opdYear, opdMonth, opdDayOfWeek, opdPeriod, weekNumMod2Remainder);
+        this.schedules.addAll(additionalSchedules);
+        return this;
+    }
+
+    public enum Gender {
+        @JsonProperty("男")
+        Male,
+        @JsonProperty("女")
+        Female
     }
 
     public static Person repeatedSchedule(
@@ -71,17 +92,11 @@ public class Person {
         return this.addOPDSchedules(opdYear, opdMonth, opdDayOfWeek, opdPeriod, null);
     }
 
-    Person addOtherSchedules(
-            Integer opdYear,
-            Integer opdMonth,
-            DayOfWeek opdDayOfWeek,
-            Time.Period opdPeriod,
-            Integer weekNumMod2Remainder) {
-        List<Schedule> additionalSchedules =
-                this.generateSchedules(
-                        Schedule.Type.OTHER, opdYear, opdMonth, opdDayOfWeek, opdPeriod, weekNumMod2Remainder);
-        this.schedules.addAll(additionalSchedules);
-        return this;
+    public enum Role {
+        @JsonProperty("住院醫師")
+        Resident,
+        @JsonProperty("小 CR")
+        AssistantChiefResident
     }
 
     Person addOPDSchedules(

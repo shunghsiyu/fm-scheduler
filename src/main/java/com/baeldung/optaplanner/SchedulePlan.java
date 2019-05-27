@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @PlanningSolution
-@ToString(includeFieldNames = true)
+@ToString
 public class SchedulePlan {
 
     Logger logger = LogManager.getLogger();
@@ -37,13 +37,23 @@ public class SchedulePlan {
 
     @ProblemFactCollectionProperty
     @ValueRangeProvider(id = "availablePersons")
-    public List<Person> getPersonList() {
+    @SuppressWarnings("WeakerAccess")
+    public List<Person> getPersons() {
         return this.persons;
     }
 
+    public void setPersons(List<Person> persons) {
+        this.persons = persons;
+    }
+
     @PlanningEntityCollectionProperty
-    public List<Schedule> getScheduleList() {
+    @SuppressWarnings("WeakerAccess")
+    public List<Schedule> getSchedules() {
         return this.schedules;
+    }
+
+    public void setSchedules(List<Schedule> schedules) {
+        this.schedules = schedules;
     }
 
     @PlanningScore

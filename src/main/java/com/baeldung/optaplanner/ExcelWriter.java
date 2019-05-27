@@ -1,22 +1,19 @@
 package com.baeldung.optaplanner;
 
 import com.baeldung.optaplanner.Schedule.Type;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ExcelWriter {
 
@@ -48,7 +45,7 @@ public class ExcelWriter {
         writeSheetHeaders(startRow, 0, sheet);
 
         Map<LocalDate, List<Schedule>> byDate =
-                plan.getScheduleList().stream()
+                plan.getSchedules().stream()
                         .collect(Collectors.groupingBy(s -> s.getTime().getLocalDate()));
         for (Map.Entry<LocalDate, List<Schedule>> entry : byDate.entrySet()) {
             LocalDate date = entry.getKey();
@@ -67,7 +64,7 @@ public class ExcelWriter {
         startRow += 1;
 
         Map<Person, List<Schedule>> byPerson =
-                plan.getScheduleList().stream()
+                plan.getSchedules().stream()
                         .collect(Collectors.groupingBy(s -> s.getAssignee()));
         for (Map.Entry<Person, List<Schedule>> entry : byPerson.entrySet()) {
             Person person = entry.getKey();
@@ -125,23 +122,23 @@ public class ExcelWriter {
                     col += papHeaderCol;
                     row += papBaseRow + period.getValue();
                     break;
-                case MORNINGMEETING_SLIDE:
+                case MorningSlide:
                     col += morningHeaderCol;
                     row += slideRow;
                     break;
-                case MORNINGMEETING_NOTE:
+                case MorningNote:
                     col += morningHeaderCol;
                     row += noteRow;
                     break;
-                case JINGFUMEETING:
+                case Jingfu:
                     col += extraHeaderCol;
                     row += slideRow;
                     break;
-                case W5MEETING_SLIDE:
+                case W5Slide:
                     col += extraHeaderCol;
                     row += slideRow;
                     break;
-                case W5MEETING_NOTE:
+                case W5Note:
                     col += extraHeaderCol;
                     row += noteRow;
                     break;
@@ -197,22 +194,22 @@ public class ExcelWriter {
 
     private static void writeAnalyticHeaders(int row, Sheet sheet) {
         writeAnalytic(sheet, row, Type.PAP, "抹片");
-        writeAnalytic(sheet, row, Type.MORNINGMEETING_NOTE, "晨會記錄");
-        writeAnalytic(sheet, row, Type.W5MEETING_NOTE, "科會記錄");
-        writeAnalytic(sheet, row, Type.MORNINGMEETING_SLIDE, "晨會投影片");
-        writeAnalytic(sheet, row, Type.W5MEETING_SLIDE, "科會投影片");
-        writeAnalytic(sheet, row, Type.JINGFUMEETING, "景福");
+        writeAnalytic(sheet, row, Type.MorningNote, "晨會記錄");
+        writeAnalytic(sheet, row, Type.W5Note, "科會記錄");
+        writeAnalytic(sheet, row, Type.MorningSlide, "晨會投影片");
+        writeAnalytic(sheet, row, Type.W5Slide, "科會投影片");
+        writeAnalytic(sheet, row, Type.Jingfu, "景福");
     }
 
     private static void writeAnalytic(
             int row, Person person, List<Schedule> schedules, Sheet sheet) {
         writeCell(sheet, analyticNameCol, row, person.getName());
         writeAnalytic(sheet, row, Type.PAP, "0");
-        writeAnalytic(sheet, row, Type.MORNINGMEETING_NOTE, "0");
-        writeAnalytic(sheet, row, Type.W5MEETING_NOTE, "0");
-        writeAnalytic(sheet, row, Type.MORNINGMEETING_SLIDE, "0");
-        writeAnalytic(sheet, row, Type.W5MEETING_SLIDE, "0");
-        writeAnalytic(sheet, row, Type.JINGFUMEETING, "0");
+        writeAnalytic(sheet, row, Type.MorningNote, "0");
+        writeAnalytic(sheet, row, Type.W5Note, "0");
+        writeAnalytic(sheet, row, Type.MorningSlide, "0");
+        writeAnalytic(sheet, row, Type.W5Slide, "0");
+        writeAnalytic(sheet, row, Type.Jingfu, "0");
 
         Map<Type, Long> countByType =
                 schedules.stream()
@@ -231,19 +228,19 @@ public class ExcelWriter {
             case PAP:
                 col = analyticPAPCol;
                 break;
-            case MORNINGMEETING_SLIDE:
+            case MorningSlide:
                 col = analyticMorningSlideCol;
                 break;
-            case MORNINGMEETING_NOTE:
+            case MorningNote:
                 col = analyticMorningNoteCol;
                 break;
-            case JINGFUMEETING:
+            case Jingfu:
                 col = analyticJingfuCol;
                 break;
-            case W5MEETING_SLIDE:
+            case W5Slide:
                 col = analyticW5SlideCol;
                 break;
-            case W5MEETING_NOTE:
+            case W5Note:
                 col = analyticW5NoteCol;
                 break;
             default:

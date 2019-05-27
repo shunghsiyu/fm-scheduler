@@ -50,7 +50,7 @@ end
 
 rule "每一個一般R人力儘量一個月內有 3 次排班的項目是抹片"
     when
-        $person : Person(role == Role.NORMAL)
+        $person : Person(role == Role.Resident)
         accumulate(
             $assignment : Schedule(assignee == $person, type == Type.PAP),
             $total : count($assignment)
@@ -61,25 +61,25 @@ end
 
 rule "小CR必須不被排晨會投影片或科會投影片"
     when
-        $person : Person(role == Role.SCR)
-        Schedule(assignee == $person, type == Type.MORNINGMEETING_SLIDE || type == Type.W5MEETING_SLIDE)
+        $person : Person(role == Role.AssistantChiefResident)
+        Schedule(assignee == $person, type == Type.MorningSlide || type == Type.W5Slide)
     then
         scoreHolder.addHardConstraintMatch(kcontext, -1);
 end
 
 rule "小CR必須不被排景福講座"
     when
-        $person : Person(role == Role.SCR)
-        Schedule(assignee == $person, type == Type.JINGFUMEETING)
+        $person : Person(role == Role.AssistantChiefResident)
+        Schedule(assignee == $person, type == Type.Jingfu)
     then
         scoreHolder.addHardConstraintMatch(kcontext, -1);
 end
 
 rule "每一個一般R人力儘量一個月內有 3 次排班的項目是晨會投影片或科會投影片"
     when
-        $person : Person(role == Role.NORMAL)
+        $person : Person(role == Role.Resident)
         accumulate(
-            $assignment : Schedule(assignee == $person, type == Type.MORNINGMEETING_SLIDE || type == Type.W5MEETING_SLIDE),
+            $assignment : Schedule(assignee == $person, type == Type.MorningSlide || type == Type.W5Slide),
             $total : count($assignment)
         )
     then
@@ -90,7 +90,7 @@ rule "每一個人力儘量一個月內有 3 次排班的項目是晨會記錄�
     when
         $person : Person()
         accumulate(
-            $assignment : Schedule(assignee == $person, type == Type.MORNINGMEETING_NOTE || type == Type.W5MEETING_NOTE),
+            $assignment : Schedule(assignee == $person, type == Type.MorningNote || type == Type.W5Note),
             $total : count($assignment)
         )
     then
@@ -99,9 +99,9 @@ end
 
 rule "每一個一般R人力儘量一個月內有 1 次排班的項目是景福講座"
     when
-        $person : Person(role == Role.NORMAL)
+        $person : Person(role == Role.Resident)
         accumulate(
-            $assignment : Schedule(assignee == $person, type == Type.JINGFUMEETING),
+            $assignment : Schedule(assignee == $person, type == Type.Jingfu),
             $total : count($assignment)
         )
     then
@@ -111,8 +111,8 @@ end
 rule "每一個人力在同一天儘量不要上午下午都被排班"
     when
         $person : Person()
-        Schedule($localDate : time.localDate, $id : id, type != Type.OTHER, assignee == $person)
-        Schedule(time.localDate == $localDate, type != Type.OTHER, assignee == $person, id > $id)
+        Schedule($localDate : time.localDate, $id : id, type != Type.Other, assignee == $person)
+        Schedule(time.localDate == $localDate, type != Type.Other, assignee == $person, id > $id)
     then
         scoreHolder.addSoftConstraintMatch(kcontext, -1);
 end
@@ -120,8 +120,8 @@ end
 rule "每一個人力在同一天儘量不要上午下午都被排班 - 門診"
     when
         $person : Person()
-        Schedule($localDate : time.localDate, $id : id, type != Type.OTHER, assignee == $person)
-        Schedule(time.localDate == $localDate, type != Type.OTHER) from $person.getSchedules()
+        Schedule($localDate : time.localDate, $id : id, type != Type.Other, assignee == $person)
+        Schedule(time.localDate == $localDate, type != Type.Other) from $person.getSchedules()
     then
         scoreHolder.addSoftConstraintMatch(kcontext, -1);
 end
@@ -136,9 +136,9 @@ end
 
 rule "每一個一般R人力儘量一個月內有 8 次排班"
     when
-        $person : Person(role == Role.NORMAL)
+        $person : Person(role == Role.Resident)
         accumulate(
-            $assignment : Schedule(assignee == $person, type != Type.OTHER),
+            $assignment : Schedule(assignee == $person, type != Type.Other),
             $total : count($assignment)
         )
     then
