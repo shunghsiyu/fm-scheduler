@@ -16,6 +16,7 @@ import org.optaplanner.core.api.solver.SolverFactory;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +51,7 @@ public class SchedulerUnitTest {
     void test_compareTime2() {
         Time t1 = Time.of(2019, 5, 1, Period.Morning);
         Time t2 = Time.of(2019, 5, 1, Period.Morning);
-        assertTrue(t1.compareTo(t2) == 0);
+        assertEquals(0, t1.compareTo(t2));
     }
 
     @Test
@@ -213,7 +214,7 @@ public class SchedulerUnitTest {
     public void test_compareSchedule2() {
         Schedule s1 = Schedule.PAP(Time.of(2019, 5, 1, Period.Afternoon));
         Schedule s2 = Schedule.PAP(Time.of(2019, 5, 1, Period.Afternoon));
-        assertTrue(s1.compareTo(s2) == 0);
+        assertEquals(0, s1.compareTo(s2));
     }
 
     @Test
@@ -320,11 +321,23 @@ public class SchedulerUnitTest {
     }
 
     @Test
-    public void test_parseSchedulePlan() {
+    public void test_parseSchedulePlan() throws IOException {
+        List<Person> persons = new ArrayList<>();
+        persons.add(
+                Person.repeatedSchedule("孫小美", Gender.Female, 2019, 6, DayOfWeek.MONDAY, Period.Afternoon)
+        );
+        Person person = persons.get(0);
+        person.setRole(Person.Role.AssistantChiefResident);
+        List<Schedule> schedules = new ArrayList<>(person.getSchedules());
+        schedules.add(Schedule.Jingfu(new Time(LocalDate.of(2019, 6, 4), Period.Afternoon)));
+        schedules.add(Schedule.Jingfu(new Time(LocalDate.of(2019, 6, 11), Period.Afternoon)));
+        schedules.add(Schedule.Jingfu(new Time(LocalDate.of(2019, 6, 18), Period.Afternoon)));
+        schedules.add(Schedule.Jingfu(new Time(LocalDate.of(2019, 6, 25), Period.Afternoon)));
+        SchedulePlan expected = new SchedulePlan(persons, schedules);
         String input = "{\n" +
                 "  \"schedules\":[\n" +
                 "    {\n" +
-                "      \"type\":\"其他\",\n" +
+                "      \"type\":\"門診\",\n" +
                 "      \"time\":{\n" +
                 "        \"localDate\":\"2019-06-03\",\n" +
                 "        \"period\":\"下午\"\n" +
@@ -332,7 +345,7 @@ public class SchedulerUnitTest {
                 "      \"assignee\":\"孫小美\"\n" +
                 "    },\n" +
                 "    {\n" +
-                "      \"type\":\"其他\",\n" +
+                "      \"type\":\"門診\",\n" +
                 "      \"time\":{\n" +
                 "        \"localDate\":\"2019-06-10\",\n" +
                 "        \"period\":\"下午\"\n" +
@@ -340,7 +353,7 @@ public class SchedulerUnitTest {
                 "      \"assignee\":\"孫小美\"\n" +
                 "    },\n" +
                 "    {\n" +
-                "      \"type\":\"其他\",\n" +
+                "      \"type\":\"門診\",\n" +
                 "      \"time\":{\n" +
                 "        \"localDate\":\"2019-06-17\",\n" +
                 "        \"period\":\"下午\"\n" +
@@ -348,7 +361,7 @@ public class SchedulerUnitTest {
                 "      \"assignee\":\"孫小美\"\n" +
                 "    },\n" +
                 "    {\n" +
-                "      \"type\":\"其他\",\n" +
+                "      \"type\":\"門診\",\n" +
                 "      \"time\":{\n" +
                 "        \"localDate\":\"2019-06-24\",\n" +
                 "        \"period\":\"下午\"\n" +
@@ -393,11 +406,8 @@ public class SchedulerUnitTest {
                 "  ]\n" +
                 "}";
         ObjectMapper mapper = new ObjectMapper();
-        try {
-            SchedulePlan plan = mapper.readValue(input, SchedulePlan.class);
-            System.out.println(plan.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SchedulePlan actual = mapper.readValue(input, SchedulePlan.class);
+        assertEquals(expected.getPersons(), actual.getPersons());
+        assertEquals(expected.getSchedules(), actual.getSchedules());
     }
 }

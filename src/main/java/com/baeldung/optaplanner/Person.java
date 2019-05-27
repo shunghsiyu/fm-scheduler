@@ -20,9 +20,7 @@ import java.util.List;
 public class Person {
 
     private String name;
-    @EqualsAndHashCode.Exclude
     private Gender gender;
-    @EqualsAndHashCode.Exclude
     private Role role;
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
@@ -99,12 +97,14 @@ public class Person {
         AssistantChiefResident
     }
 
-    Person addOPDSchedules(
+    @SuppressWarnings("WeakerAccess")
+    public Person addOPDSchedules(
             Integer opdYear, Integer opdMonth, DayOfWeek opdDayOfWeek, Time.Period opdPeriod) {
         return this.addOPDSchedules(opdYear, opdMonth, opdDayOfWeek, opdPeriod, null);
     }
 
-    Person addOPDSchedules(
+    @SuppressWarnings("WeakerAccess")
+    public Person addOPDSchedules(
             Integer opdYear,
             Integer opdMonth,
             DayOfWeek opdDayOfWeek,
@@ -151,7 +151,7 @@ public class Person {
         return this.role;
     }
 
-    void setRole(Role role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 }
