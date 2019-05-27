@@ -159,7 +159,7 @@ const ScheduleEdit: React.FC<{ value: Schedule[], onChange: Dispatch<Schedule[]>
         };
         const deleteButton = <Button icon="delete" size="mini" onClick={ deleteSchedule }/>;
         return (
-            <Table.Row key={ type + time.date.toISODate() + time.period }>
+            <Table.Row key={ type + time.localDate.toISODate() + time.period }>
                 <Table.Cell>{ time.dateStr() }
                     <small> { time.period }</small>
                 </Table.Cell>
