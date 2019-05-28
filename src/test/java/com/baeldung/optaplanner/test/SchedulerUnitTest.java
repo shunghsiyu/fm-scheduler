@@ -328,7 +328,7 @@ public class SchedulerUnitTest {
         );
         Person person = persons.get(0);
         person.setRole(Person.Role.AssistantChiefResident);
-        List<Schedule> schedules = new ArrayList<>(person.getSchedules());
+        List<Schedule> schedules = new ArrayList<>();
         schedules.add(Schedule.Jingfu(new Time(LocalDate.of(2019, 6, 4), Period.Afternoon)));
         schedules.add(Schedule.Jingfu(new Time(LocalDate.of(2019, 6, 11), Period.Afternoon)));
         schedules.add(Schedule.Jingfu(new Time(LocalDate.of(2019, 6, 18), Period.Afternoon)));
@@ -336,38 +336,6 @@ public class SchedulerUnitTest {
         SchedulePlan expected = new SchedulePlan(persons, schedules);
         String input = "{\n" +
                 "  \"schedules\":[\n" +
-                "    {\n" +
-                "      \"type\":\"門診\",\n" +
-                "      \"time\":{\n" +
-                "        \"localDate\":\"2019-06-03\",\n" +
-                "        \"period\":\"下午\"\n" +
-                "      },\n" +
-                "      \"assignee\":\"孫小美\"\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"type\":\"門診\",\n" +
-                "      \"time\":{\n" +
-                "        \"localDate\":\"2019-06-10\",\n" +
-                "        \"period\":\"下午\"\n" +
-                "      },\n" +
-                "      \"assignee\":\"孫小美\"\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"type\":\"門診\",\n" +
-                "      \"time\":{\n" +
-                "        \"localDate\":\"2019-06-17\",\n" +
-                "        \"period\":\"下午\"\n" +
-                "      },\n" +
-                "      \"assignee\":\"孫小美\"\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"type\":\"門診\",\n" +
-                "      \"time\":{\n" +
-                "        \"localDate\":\"2019-06-24\",\n" +
-                "        \"period\":\"下午\"\n" +
-                "      },\n" +
-                "      \"assignee\":\"孫小美\"\n" +
-                "    },\n" +
                 "    {\n" +
                 "      \"type\":\"景福\",\n" +
                 "      \"time\":{\n" +
@@ -401,7 +369,41 @@ public class SchedulerUnitTest {
                 "    {\n" +
                 "      \"name\":\"孫小美\",\n" +
                 "      \"gender\":\"女\",\n" +
-                "      \"role\":\"小 CR\"\n" +
+                "      \"role\":\"小 CR\",\n" +
+                "      \"schedules\":[\n" +
+                "        {\n" +
+                "          \"type\":\"門診\",\n" +
+                "          \"time\":{\n" +
+                "            \"localDate\":\"2019-06-03\",\n" +
+                "            \"period\":\"下午\"\n" +
+                "          },\n" +
+                "          \"assignee\":\"孫小美\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"type\":\"門診\",\n" +
+                "          \"time\":{\n" +
+                "            \"localDate\":\"2019-06-10\",\n" +
+                "            \"period\":\"下午\"\n" +
+                "          },\n" +
+                "          \"assignee\":\"孫小美\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"type\":\"門診\",\n" +
+                "          \"time\":{\n" +
+                "            \"localDate\":\"2019-06-17\",\n" +
+                "            \"period\":\"下午\"\n" +
+                "          },\n" +
+                "          \"assignee\":\"孫小美\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"type\":\"門診\",\n" +
+                "          \"time\":{\n" +
+                "            \"localDate\":\"2019-06-24\",\n" +
+                "            \"period\":\"下午\"\n" +
+                "          },\n" +
+                "          \"assignee\":\"孫小美\"\n" +
+                "        }\n" +
+                "      ]\n" +
                 "    }\n" +
                 "  ]\n" +
                 "}";
