@@ -8,7 +8,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
@@ -17,25 +20,40 @@ import java.util.stream.Collectors;
 
 public class ExcelWriter {
 
-    private static int[] weeks = new int[] {1, 2, 3, 4, 5};
-    private static int[] rowStart = new int[] {0, 4, 8, 12, 16};
-    private static int[] colStart = new int[] {0, 2, 5, 7, 9};
+    private static int[] weeks = new int[]{1, 2, 3, 4, 5};
+    private static int[] rowStart = new int[]{0, 4, 8, 12, 16};
+    private static int[] colStart = new int[]{0, 2, 5, 7, 9};
+    private static int dateCol = 0;
+    private static int dateRow = 0;
+    private static int morningHeaderCol = 0;
+    private static int morningHeaderRow = 1;
+    private static int papHeaderCol = 1;
+    private static int papHeaderRow = 1;
+    private static int extraHeaderCol = 2;
+    private static int extraHeaderRow = 1;
+    private static int papBaseRow = 2;
+    private static int slideRow = 2;
+    private static int noteRow = 3;
+    private static int analyticNameCol = 0;
+    private static int analyticPAPCol = 1;
+    private static int analyticMorningNoteCol = 2;
+    private static int analyticW5NoteCol = 3;
+    private static int analyticMorningSlideCol = 4;
+    private static int analyticW5SlideCol = 5;
+    private static int analyticJingfuCol = 6;
 
-    public static void output(SchedulePlan plan, File excelFile) {
-        try {
-            Workbook workbook = generateWorkbook(plan);
-            OutputStream output = new FileOutputStream(excelFile);
-            workbook.write(output);
-        } catch (FileNotFoundException e) {
-            System.out.println(e.toString());
-            System.exit(-1);
-        } catch (IOException e) {
-            System.out.println(e.toString());
-            System.exit(-1);
-        }
+    public static void output(SchedulePlan plan, File excelFile) throws IOException {
+        OutputStream output = new FileOutputStream(excelFile);
+        output(plan, output);
     }
 
-    public static Workbook generateWorkbook(SchedulePlan plan) {
+    @SuppressWarnings("WeakerAccess")
+    public static void output(SchedulePlan plan, OutputStream stream) throws IOException {
+        Workbook workbook = generateWorkbook(plan);
+        workbook.write(stream);
+    }
+
+    private static Workbook generateWorkbook(SchedulePlan plan) {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet();
 
@@ -65,7 +83,7 @@ public class ExcelWriter {
 
         Map<Person, List<Schedule>> byPerson =
                 plan.getSchedules().stream()
-                        .collect(Collectors.groupingBy(s -> s.getAssignee()));
+                        .collect(Collectors.groupingBy(Schedule::getAssignee));
         for (Map.Entry<Person, List<Schedule>> entry : byPerson.entrySet()) {
             Person person = entry.getKey();
             List<Schedule> schedules = entry.getValue();
@@ -86,25 +104,12 @@ public class ExcelWriter {
         return 1 + (dayOfMonth + extraDays - 1) / 7;
     }
 
-    private static int dateCol = 0;
-    private static int dateRow = 0;
-    private static int morningHeaderCol = 0;
-    private static int morningHeaderRow = 1;
-    private static int papHeaderCol = 1;
-    private static int papHeaderRow = 1;
-    private static int extraHeaderCol = 2;
-    private static int extraHeaderRow = 1;
-    private static int papBaseRow = 2;
-    private static int slideRow = 2;
-    private static int noteRow = 3;
-
     private static void writeSheetHeaders(int baseRow, int baseCol, Sheet sheet) {
         for (int weekNum : weeks) {
             int row = baseRow + rowStart[weekNum - 1];
-            int col = baseCol;
-            writeCell(sheet, col, row + slideRow, "上午／投影片");
-            writeCell(sheet, col, row + noteRow, "下午／記錄");
-            System.out.printf("Header weekNum: %d, col: %d, row: %d\n", weekNum, col, row);
+            writeCell(sheet, baseCol, row + slideRow, "上午／投影片");
+            writeCell(sheet, baseCol, row + noteRow, "下午／記錄");
+            System.out.printf("Header weekNum: %d, col: %d, row: %d\n", weekNum, baseCol, row);
         }
     }
 
@@ -150,7 +155,6 @@ public class ExcelWriter {
                     sched.getAssignee().getName(), sched.getType().name(), col, row);
             writeCell(sheet, col, row, sched.getAssignee().getName());
         }
-        return;
     }
 
     private static void writeHeaders(int baseRow, int baseCol, LocalDate date, Sheet sheet) {
@@ -184,14 +188,6 @@ public class ExcelWriter {
         }
     }
 
-    private static int analyticNameCol = 0;
-    private static int analyticPAPCol = 1;
-    private static int analyticMorningNoteCol = 2;
-    private static int analyticW5NoteCol = 3;
-    private static int analyticMorningSlideCol = 4;
-    private static int analyticW5SlideCol = 5;
-    private static int analyticJingfuCol = 6;
-
     private static void writeAnalyticHeaders(int row, Sheet sheet) {
         writeAnalytic(sheet, row, Type.PAP, "抹片");
         writeAnalytic(sheet, row, Type.MorningNote, "晨會記錄");
@@ -223,7 +219,7 @@ public class ExcelWriter {
     }
 
     private static void writeAnalytic(Sheet sheet, int row, Type type, String value) {
-        int col = -1;
+        int col;
         switch (type) {
             case PAP:
                 col = analyticPAPCol;
