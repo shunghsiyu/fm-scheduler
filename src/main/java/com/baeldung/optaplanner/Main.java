@@ -8,15 +8,19 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.EnumSet;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -40,6 +44,11 @@ public class Main {
 
         ServletHolder schedulerHolder = new ServletHolder("scheduler", SchedulerServlet.class);
         context.addServlet(schedulerHolder, "/schedules");
+        if (System.getProperty("allowCrossOrigin") != null) {
+            FilterHolder filterHolder = context.addFilter(CrossOriginFilter.class, "/schedules", EnumSet.allOf(DispatcherType.class));
+            filterHolder.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "POST,OPTIONS");
+            filterHolder.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
+        }
 
         server.start();
         server.join();
