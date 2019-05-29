@@ -479,16 +479,16 @@ const App: React.FC = () => {
 
     const generateOutput = () => {
         const persons: Person[] = [];
-        const allSchedules: Schedule[] = personSchedules.flatMap(([person, repeatedSchedules]) => {
+        personSchedules.forEach(([person, repeatedSchedules]) => {
             persons.push(person);
-            return repeatedSchedules.flatMap(repeatedSchedule => {
+            repeatedSchedules.forEach(repeatedSchedule => {
                 const newRepeatedSchedule = Object.create(repeatedSchedule);
                 Object.assign(newRepeatedSchedule, repeatedSchedule);
                 newRepeatedSchedule.assignee = person;
-                return newRepeatedSchedule.toSchedules()
+                person.schedules = person.schedules.concat(newRepeatedSchedule.toSchedules());
             })
-        }).concat(emptySchedules);
-        const output = { schedules: allSchedules, persons };
+        });
+        const output = { schedules: emptySchedules, persons };
         return JSON.stringify(output, function (key, value) {
             if (key === 'assignee' && value instanceof Person) {
                 return value.name;
