@@ -485,6 +485,7 @@ const App: React.FC = () => {
     };
     const [personSchedules, setPersonSchedules] = useState<PersonSchedule[]>(defaultPersonSchedules);
     const segmentStyle = { paddingBottom: "4em" };
+    const [loading, setLoading] = useState<boolean>(false);
 
     const generateOutput = () => {
         const persons: Person[] = [];
@@ -506,9 +507,11 @@ const App: React.FC = () => {
         });
     };
     const sendRequest = (): void => {
-        request('POST', '/schedules', generateOutput())
+        setLoading(true);
+        request('POST', 'http://localhost:8080/schedules', generateOutput())
             .then(target => {
-                    saveBlob(target.response as Blob, 'output.xlsx');
+                setLoading(false);
+                saveBlob(target.response as Blob, 'output.xlsx');
             })
             .catch(console.error);
     };
@@ -549,7 +552,7 @@ const App: React.FC = () => {
                 <Grid>
                     <Grid.Column width={ 4 }/>
                     <Grid.Column width={ 8 }>
-                        <Button positive fluid size="huge"
+                        <Button positive fluid size="huge" loading={ loading }
                                 onClick={ sendRequest }>自動排班</Button>
                     </Grid.Column>
                     <Grid.Column width={ 4 }/>
