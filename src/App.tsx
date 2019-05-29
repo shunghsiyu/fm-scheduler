@@ -22,7 +22,7 @@ import Schedule, { RepeatedSchedule, Type } from "./Schedule"
 import { Period, Repeat, RepeatType, WeekDay, weekDayMapping, workingDays } from "./Time"
 import isEqual from "lodash.isequal"
 import { DateTime } from "luxon";
-import { noop } from "./util";
+import { noop, request, saveBlob } from "./util";
 
 type BasicProps = {
     year: number,
@@ -438,7 +438,16 @@ const YearMonthChooser: React.FC<YearMonthChooseProps> = ({ year, month, setYear
 };
 
 const defaultPersonSchedules: PersonSchedule[] = [
-    [new Person('孫小美', Role.AssistantChiefResident, Gender.Female), []],
+    [
+        new Person('孫小美', Role.AssistantChiefResident, Gender.Female),
+        [
+            new RepeatedSchedule(Type.Other, now.year, now.month + 1, {
+                type: RepeatType.Week,
+                weekday: WeekDay.Monday,
+                period: Period.Afternoon
+            }),
+        ]
+    ],
     [new Person('王小明', Role.Resident, Gender.Male), []],
 ];
 const defaultRepeatedSchedules: RepeatedSchedule[] = [
@@ -496,6 +505,13 @@ const App: React.FC = () => {
             return value;
         });
     };
+    const sendRequest = (): void => {
+        request('POST', '/schedules', generateOutput())
+            .then(target => {
+                    saveBlob(target.response as Blob, 'output.xlsx');
+            })
+            .catch(console.error);
+    };
     return (
         <Container style={ { margin: 20 } }>
             <Segment as="section" basic style={ segmentStyle }>
@@ -534,7 +550,7 @@ const App: React.FC = () => {
                     <Grid.Column width={ 4 }/>
                     <Grid.Column width={ 8 }>
                         <Button positive fluid size="huge"
-                                onClick={ () => console.log(generateOutput()) }>自動排班</Button>
+                                onClick={ sendRequest }>自動排班</Button>
                     </Grid.Column>
                     <Grid.Column width={ 4 }/>
                 </Grid>
