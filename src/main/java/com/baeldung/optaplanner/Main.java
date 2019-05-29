@@ -7,7 +7,9 @@ import org.apache.logging.log4j.core.config.DefaultConfiguration;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 
@@ -24,9 +26,21 @@ public class Main {
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(8080);
         server.setConnectors(new Connector[]{connector});
-        ServletHandler handler = new ServletHandler();
-        server.setHandler(handler);
-        handler.addServletWithMapping(SchedulerServlet.class, "/*");
+
+        ServletContextHandler context = new ServletContextHandler(
+                ServletContextHandler.NO_SESSIONS);
+        context.setContextPath("/");
+        String resourcePath = Main.class.getResource("/webapp").toString();
+        context.setResourceBase(resourcePath);
+        server.setHandler(context);
+
+        ServletHolder defaultHolder = new ServletHolder("default", DefaultServlet.class);
+        defaultHolder.setInitParameter("dirAllowed", "false");
+        context.addServlet(defaultHolder, "/");
+
+        ServletHolder schedulerHolder = new ServletHolder("scheduler", SchedulerServlet.class);
+        context.addServlet(schedulerHolder, "/schedules");
+
         server.start();
         server.join();
     }
