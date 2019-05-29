@@ -23,7 +23,6 @@ public class Time implements Comparable<Time> {
         this(null, null);
     }
 
-    @SuppressWarnings("WeakerAccess")
     public Time(LocalDate localDate, Period period) {
         this.localDate = localDate;
         this.period = period;
@@ -34,6 +33,7 @@ public class Time implements Comparable<Time> {
         return new Time(date, period);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public LocalDate getLocalDate() {
         return this.localDate;
     }
@@ -71,7 +71,7 @@ public class Time implements Comparable<Time> {
     }
 
     public enum Period {
-        @JsonProperty("上午")
+        @JsonProperty("早上")
         Morning,
         @JsonProperty("下午")
         Afternoon;
