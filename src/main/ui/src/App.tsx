@@ -74,20 +74,27 @@ const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, pe
         setOccupiedSchedules([...occupiedSchedules, value])
     };
 
-    const schedulesItem = occupiedSchedules.map((repeatedSchedule, idx) => {
-        const repeatStr: string = Object.values(repeatedSchedule.repeat).join(' ');
-        const deleteSchedule = () => {
-            const newOccupiedSchedules = occupiedSchedules.slice();
-            newOccupiedSchedules.splice(idx, 1);
-            setOccupiedSchedules(newOccupiedSchedules)
-        };
-        return (
-            <List.Item key={ repeatStr }>
-                { repeatStr }
-                <Icon name="delete" onClick={ deleteSchedule } style={ { cursor: "pointer", paddingLeft: "0.4em" } }/>
-            </List.Item>
-        );
-    });
+    const repeatedSchedulesToListItems = (repeatedSchedules: RepeatedSchedule[], type: Type) => {
+        return repeatedSchedules.filter(repeatedSchedule => repeatedSchedule.type === type)
+            .map(repeatedSchedule => {
+                const repeatStr: string = Object.values(repeatedSchedule.repeat).join(' ');
+                const deleteSchedule = () => {
+                    const newOccupiedSchedules = occupiedSchedules.slice();
+                    const idx = newOccupiedSchedules.indexOf(repeatedSchedule);
+                    newOccupiedSchedules.splice(idx, 1);
+                    setOccupiedSchedules(newOccupiedSchedules)
+                };
+                return (
+                    <List.Item key={ repeatStr }>
+                        { repeatStr }
+                        <Icon name="delete" onClick={ deleteSchedule }
+                              style={ { cursor: "pointer", paddingLeft: "0.4em" } }/>
+                    </List.Item>
+                );
+            })
+    };
+    const otherSchedulesItem = repeatedSchedulesToListItems(occupiedSchedules, Type.Other);
+    const opdSchedulesItem = repeatedSchedulesToListItems(occupiedSchedules, Type.OPD);
     return (
         <Card as="section" fluid>
             <Card.Content>
@@ -99,8 +106,12 @@ const PersonScheduleEdit: React.FC<PersonScheduleEditProps> = ({ year, month, pe
                 <Card.Meta>{ person.role }</Card.Meta>
             </Card.Content>
             <Card.Content>
-                <Header size="tiny">不能排班時間</Header>
-                <List style={ { margin: "0 1em" } }>{ schedulesItem }</List>
+                <Header size="tiny">門診時間</Header>
+                <List style={ { margin: "0 1em" } }>{ opdSchedulesItem }</List>
+                <RepeatedScheduleAdd year={ year } month={ month } forceType={ "OPD" } positiveButton={ false }
+                                     submitText="新增時間" onSubmit={ newOccupiedSchedule }/>
+                <Header size="tiny">其他不能排班時間</Header>
+                <List style={ { margin: "0 1em" } }>{ otherSchedulesItem }</List>
                 <RepeatedScheduleAdd year={ year } month={ month } forceType={ "Other" } positiveButton={ false }
                                      submitText="新增時間" onSubmit={ newOccupiedSchedule }/>
             </Card.Content>
@@ -441,10 +452,15 @@ const defaultPersonSchedules: PersonSchedule[] = [
     [
         new Person('孫小美', Role.AssistantChiefResident, Gender.Female),
         [
-            new RepeatedSchedule(Type.Other, now.year, now.month + 1, {
+            new RepeatedSchedule(Type.OPD, now.year, now.month + 1, {
                 type: RepeatType.Week,
                 weekday: WeekDay.Monday,
                 period: Period.Afternoon
+            }),
+            new RepeatedSchedule(Type.Other, now.year, now.month + 1, {
+                type: RepeatType.Week,
+                weekday: WeekDay.Wednesday,
+                period: Period.Morning
             }),
         ]
     ],
