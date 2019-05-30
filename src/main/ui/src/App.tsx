@@ -7,9 +7,9 @@ import { Period, RepeatType, WeekDay } from "./Time"
 import { DateTime } from "luxon";
 import { request, saveBlob } from "./util";
 import { PersonSchedule } from "./types";
-import { RepeatedSchedulesEdit } from "./RepeatedSchedulesEdit";
-import { ScheduleEdit } from "./ScheduleEdit";
-import { PersonScheduleOverview } from "./PersonScheduleOverview";
+import RepeatedSchedulesEdit from "./RepeatedSchedulesEdit";
+import ScheduleEdit from "./ScheduleEdit";
+import PersonScheduleOverview from "./PersonScheduleOverview";
 
 const now = DateTime.local();
 const yearOptions = Array(5).fill(1).map((_, i) => {

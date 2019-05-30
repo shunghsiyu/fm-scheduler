@@ -2,7 +2,7 @@ import React, { Dispatch } from "react";
 import Schedule from "./Schedule";
 import { Button, Table } from "semantic-ui-react";
 
-export const ScheduleEdit: React.FC<{ value: Schedule[], onChange: Dispatch<Schedule[]> }> = ({ onChange, value }) => {
+const ScheduleEdit: React.FC<{ value: Schedule[], onChange: Dispatch<Schedule[]> }> = ({ onChange, value }) => {
     const tableRows = value.map((schedule, idx) => {
         const { type, time } = schedule;
         const deleteSchedule = (): void => {
@@ -36,3 +36,5 @@ export const ScheduleEdit: React.FC<{ value: Schedule[], onChange: Dispatch<Sche
         </Table>
     )
 };
+
+export default ScheduleEdit;

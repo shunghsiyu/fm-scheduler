@@ -8,7 +8,7 @@ type PersonScheduleOverviewProps = {
     value: PersonSchedule[],
     onChange?: Dispatch<PersonSchedule[]>,
 } & BasicProps;
-export const PersonScheduleOverview: React.FC<PersonScheduleOverviewProps> = ({ year, month, value, onChange = noop }) => {
+const PersonScheduleOverview: React.FC<PersonScheduleOverviewProps> = ({ year, month, value, onChange = noop }) => {
     const children = value.map(([person, repeatedSchedules], idx) => {
         const deletePerson = () => {
             const newValue = value.slice();
@@ -33,3 +33,5 @@ export const PersonScheduleOverview: React.FC<PersonScheduleOverviewProps> = ({ 
             <PersonAdd onSubmit={ newPerson => onChange([...value, [newPerson, []]]) }/>
         </>);
 };
+
+export default PersonScheduleOverview;

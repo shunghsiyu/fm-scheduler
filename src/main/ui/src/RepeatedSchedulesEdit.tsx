@@ -10,7 +10,7 @@ type RepeatedSchedulesEditProps = {
     value: RepeatedSchedule[],
     onChange?: Dispatch<RepeatedSchedule[]>,
 }
-export const RepeatedSchedulesEdit: React.FC<RepeatedSchedulesEditProps> = ({ year, month, value, onChange = noop }) => {
+const RepeatedSchedulesEdit: React.FC<RepeatedSchedulesEditProps> = ({ year, month, value, onChange = noop }) => {
     const tableRows = value.map((repeatedSchedule, idx) => {
         const { type, repeat } = repeatedSchedule;
         const deleteRepeatedSchedule = (): void => {
@@ -52,3 +52,5 @@ export const RepeatedSchedulesEdit: React.FC<RepeatedSchedulesEditProps> = ({ ye
         </>
     )
 };
+
+export default RepeatedSchedulesEdit;
