@@ -8,7 +8,7 @@ Create single jar for distribution
 
     mvn clean compile assembly:single
 
-Run Main
+Run Main (for development add `-DallowCrossOrigin`)
 
     mvn exec:java -Dexec.cleanupDaemonThreads=false -Dexec.mainClass="com.baeldung.optaplanner.Main"
 
