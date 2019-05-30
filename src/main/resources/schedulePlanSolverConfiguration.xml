@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<solver>
+    <scanAnnotatedClasses>
+        <packageInclude>com.baeldung.optaplanner</packageInclude>
+    </scanAnnotatedClasses>
+
+    <scoreDirectorFactory>
+        <easyScoreCalculatorClass>com.baeldung.optaplanner.ScoreCalculator</easyScoreCalculatorClass>
+    </scoreDirectorFactory>
+
+    <termination>
+        <secondsSpentLimit>30</secondsSpentLimit>
+    </termination>
+</solver>

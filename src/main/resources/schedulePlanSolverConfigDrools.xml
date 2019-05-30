@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<solver>
+    <scanAnnotatedClasses>
+        <packageInclude>com.baeldung.optaplanner</packageInclude>
+    </scanAnnotatedClasses>
+
+    <scoreDirectorFactory>
+        <scoreDrl>schedulePlan.drl</scoreDrl>
+    </scoreDirectorFactory>
+
+    <termination>
+        <secondsSpentLimit>5</secondsSpentLimit>
+    </termination>
+
+    <environmentMode>NON_REPRODUCIBLE</environmentMode>
+</solver>
