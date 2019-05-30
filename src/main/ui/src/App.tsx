@@ -40,50 +40,54 @@ const YearMonthChooser: React.FC<YearMonthChooseProps> = ({ year, month, setYear
     )
 };
 
-const defaultPersonSchedules: PersonSchedule[] = [
-    [
-        new Person('孫小美', Role.AssistantChiefResident, Gender.Female),
+const getDefaultPersonSchedules = (year: number, month: number): PersonSchedule[] => {
+    return [
         [
-            new RepeatedSchedule(Type.OPD, now.year, now.month + 1, {
-                type: RepeatType.Week,
-                weekday: WeekDay.Monday,
-                period: Period.Afternoon
-            }),
-            new RepeatedSchedule(Type.Other, now.year, now.month + 1, {
-                type: RepeatType.Week,
-                weekday: WeekDay.Wednesday,
-                period: Period.Morning
-            }),
-        ]
-    ],
-    [new Person('王小明', Role.Resident, Gender.Male), []],
-];
-const defaultRepeatedSchedules: RepeatedSchedule[] = [
-    new RepeatedSchedule(Type.MorningNote, now.year, now.month + 1, { type: RepeatType.Day, period: Period.Morning }),
-    new RepeatedSchedule(Type.MorningSlide, now.year, now.month + 1, { type: RepeatType.Day, period: Period.Morning }),
-    new RepeatedSchedule(Type.Jingfu, now.year, now.month + 1, {
-        type: RepeatType.Week,
-        weekday: 2,
-        period: Period.Afternoon
-    }),
-    new RepeatedSchedule(Type.W5Note, now.year, now.month + 1, {
-        type: RepeatType.Week,
-        weekday: 5,
-        period: Period.Afternoon
-    }),
-    new RepeatedSchedule(Type.W5Slide, now.year, now.month + 1, {
-        type: RepeatType.Week,
-        weekday: 5,
-        period: Period.Afternoon
-    }),
-    new RepeatedSchedule(Type.PAP, now.year, now.month + 1, { type: RepeatType.Period }),
-];
-const defaultSchedules = defaultRepeatedSchedules.flatMap(r => r.toSchedules()).sort((a, b) => a.comparesTo(b));
+            new Person('孫小美', Role.AssistantChiefResident, Gender.Female),
+            [
+                new RepeatedSchedule(Type.OPD, year, month, {
+                    type: RepeatType.Week,
+                    weekday: WeekDay.Monday,
+                    period: Period.Afternoon
+                }),
+                new RepeatedSchedule(Type.Other, year, month, {
+                    type: RepeatType.Week,
+                    weekday: WeekDay.Wednesday,
+                    period: Period.Morning
+                }),
+            ]
+        ],
+        [new Person('王小明', Role.Resident, Gender.Male), []],
+    ];
+};
+
+const getDefaultRepeatedSchedules = (year: number, month: number): RepeatedSchedule[] => {
+    return [
+        new RepeatedSchedule(Type.MorningNote, year, month, { type: RepeatType.Day, period: Period.Morning }),
+        new RepeatedSchedule(Type.MorningSlide, year, month, { type: RepeatType.Day, period: Period.Morning }),
+        new RepeatedSchedule(Type.Jingfu, year, month, {
+            type: RepeatType.Week,
+            weekday: 2,
+            period: Period.Afternoon
+        }),
+        new RepeatedSchedule(Type.W5Note, year, month, {
+            type: RepeatType.Week,
+            weekday: 5,
+            period: Period.Afternoon
+        }),
+        new RepeatedSchedule(Type.W5Slide, year, month, {
+            type: RepeatType.Week,
+            weekday: 5,
+            period: Period.Afternoon
+        }),
+        new RepeatedSchedule(Type.PAP, year, month, { type: RepeatType.Period }),
+    ];
+};
 const App: React.FC = () => {
-    const [year, setYear] = useState<number>(now.year);
-    const [month, setMonth] = useState<number>((now.plus({ month: 1 })).month);
-    const [repeatedSchedules, _setRepeatedSchedules] = useState<RepeatedSchedule[]>(defaultRepeatedSchedules);
-    const [emptySchedules, setEmptySchedules] = useState<Schedule[]>(defaultSchedules);
+    const [year, _setYear] = useState<number>(now.year);
+    const [month, _setMonth] = useState<number>((now.plus({ month: 1 })).month);
+    const [repeatedSchedules, _setRepeatedSchedules] = useState<RepeatedSchedule[]>(getDefaultRepeatedSchedules(year, month));
+    const [emptySchedules, setEmptySchedules] = useState<Schedule[]>(repeatedSchedules.flatMap(r => r.toSchedules()).sort((a, b) => a.comparesTo(b)));
     const [accordionState, setAccordionState] = useState<boolean>(false);
     const setRepeatedSchedules: Dispatch<RepeatedSchedule[]> = newRepeatedSchedules => {
         const schedules = newRepeatedSchedules.flatMap(r => r.toSchedules()).sort((a, b) => a.comparesTo(b));
@@ -91,10 +95,20 @@ const App: React.FC = () => {
         setAccordionState(true);
         _setRepeatedSchedules(newRepeatedSchedules);
     };
-    const [personSchedules, setPersonSchedules] = useState<PersonSchedule[]>(defaultPersonSchedules);
+    const [personSchedules, setPersonSchedules] = useState<PersonSchedule[]>(getDefaultPersonSchedules(year, month));
     const segmentStyle = { paddingBottom: "4em" };
     const [loading, setLoading] = useState<boolean>(false);
 
+    const setYear = (newYear: number) => {
+        setRepeatedSchedules(getDefaultRepeatedSchedules(newYear, month));
+        setPersonSchedules(getDefaultPersonSchedules(newYear, month));
+        _setYear(newYear);
+    };
+    const setMonth = (newMonth: number) => {
+        setRepeatedSchedules(getDefaultRepeatedSchedules(year, newMonth));
+        setPersonSchedules(getDefaultPersonSchedules(year, newMonth));
+        _setMonth(newMonth);
+    };
     const generateOutput = () => {
         const persons: Person[] = [];
         personSchedules.forEach(([person, repeatedSchedules]) => {
