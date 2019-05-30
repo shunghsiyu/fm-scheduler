@@ -2,3 +2,4 @@
 .DS_Store
 target/*
 libraries/*
+src/main/resources/webapp/*
