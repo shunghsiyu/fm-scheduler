@@ -15,3 +15,4 @@ Run Main
 # Relevant articles
 
 - [A Guide to OptaPlanner](https://www.baeldung.com/opta-planner)
+- [Optaplanner 7.13.0 cant be executed from a jar file](https://stackoverflow.com/questions/53199223/optaplanner-7-13-0-cant-be-executed-from-a-jar-file)
