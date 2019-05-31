@@ -1,5 +1,5 @@
 import React, { Dispatch, useState } from 'react';
-import { Accordion, Button, Container, Divider, Form, Grid, Header, Icon, Segment } from 'semantic-ui-react'
+import { Accordion, Button, Container, Divider, Form, Grid, Header, Segment } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css'
 import Person, { Gender, Role } from './Person'
 import Schedule, { RepeatedSchedule, Type } from "./Schedule"
@@ -88,15 +88,14 @@ const App: React.FC = () => {
     const [month, _setMonth] = useState<number>((now.plus({ month: 1 })).month);
     const [repeatedSchedules, _setRepeatedSchedules] = useState<RepeatedSchedule[]>(getDefaultRepeatedSchedules(year, month));
     const [emptySchedules, setEmptySchedules] = useState<Schedule[]>(repeatedSchedules.flatMap(r => r.toSchedules()).sort((a, b) => a.comparesTo(b)));
-    const [accordionState, setAccordionState] = useState<boolean>(false);
+    const [accordionOpen, setAccordionOpen] = useState<boolean>(false);
     const setRepeatedSchedules: Dispatch<RepeatedSchedule[]> = newRepeatedSchedules => {
         const schedules = newRepeatedSchedules.flatMap(r => r.toSchedules()).sort((a, b) => a.comparesTo(b));
         setEmptySchedules(schedules);
-        setAccordionState(true);
         _setRepeatedSchedules(newRepeatedSchedules);
     };
     const [personSchedules, setPersonSchedules] = useState<PersonSchedule[]>(getDefaultPersonSchedules(year, month));
-    const segmentStyle = { paddingBottom: "4em" };
+    const segmentStyle = { marginBottom: "1.5em" };
     const [loading, setLoading] = useState<boolean>(false);
 
     const setYear = (newYear: number) => {
@@ -144,24 +143,26 @@ const App: React.FC = () => {
                 <Divider hidden/>
                 <YearMonthChooser year={ year } month={ month } setYear={ setYear } setMonth={ setMonth }/>
             </Segment>
-            <Segment as="section" basic style={ segmentStyle }>
-                <Header as="h2">編輯班次</Header>
-                <Divider hidden/>
-                <RepeatedSchedulesEdit year={ year } month={ month } value={ repeatedSchedules }
-                                       onChange={ setRepeatedSchedules }/>
-                <Accordion as="section">
-                    <Accordion.Title active={ accordionState } onClick={ () => setAccordionState(!accordionState) }>
-                        <Header as="h3">
-                            <Icon name='dropdown'/>
-                            { accordionState ? "隱藏" : "編輯" }詳細班次
-                        </Header>
-                    </Accordion.Title>
-                    <Accordion.Content active={ accordionState }>
+            <Accordion as="section" style={ { padding: "1em", ...segmentStyle } }>
+                <Accordion.Title active={ accordionOpen } onClick={ () => setAccordionOpen(!accordionOpen) }>
+                    <Header as="h2">
+                        { accordionOpen ? "隱藏" : "編輯" }班次
+                    </Header>
+                </Accordion.Title>
+                <Accordion.Content active={ !accordionOpen }>
+                    點擊標題以開啓編輯畫面
+                </Accordion.Content>
+                <Accordion.Content active={ accordionOpen }>
+                    <RepeatedSchedulesEdit year={ year } month={ month } value={ repeatedSchedules }
+                                           onChange={ setRepeatedSchedules }/>
+                    <Segment as="section" basic>
+                        <Header as="h3">詳細班次</Header>
+                        <Divider hidden/>
                         <p>編輯上方班次後，下面詳細班次將會重置</p>
                         <ScheduleEdit value={ emptySchedules } onChange={ setEmptySchedules }/>
-                    </Accordion.Content>
-                </Accordion>
-            </Segment>
+                    </Segment>
+                </Accordion.Content>
+            </Accordion>
             <Segment as="section" basic style={ segmentStyle }>
                 <Header as="h2">參與者</Header>
                 <Divider hidden/>
