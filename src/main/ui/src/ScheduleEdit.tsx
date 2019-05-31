@@ -22,7 +22,7 @@ const ScheduleEdit: React.FC<{ value: Schedule[], onChange: Dispatch<Schedule[]>
         );
     });
     return (
-        <Table singleLine>
+        <Table singleLine selectable>
             <Table.Header>
                 <Table.Row>
                     <Table.HeaderCell>時間</Table.HeaderCell>

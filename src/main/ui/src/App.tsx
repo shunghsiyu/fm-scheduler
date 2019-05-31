@@ -137,7 +137,7 @@ const App: React.FC = () => {
             .catch(console.error);
     };
     return (
-        <Container style={ { margin: 20 } }>
+        <Container text style={ { margin: 20 } }>
             <Segment as="section" basic style={ segmentStyle }>
                 <Header as="h2">選擇時間</Header>
                 <Divider hidden/>

@@ -35,7 +35,7 @@ const RepeatedSchedulesEdit: React.FC<RepeatedSchedulesEditProps> = ({ year, mon
     });
     return (
         <>
-            <Table singleLine>
+            <Table singleLine selectable>
                 <Table.Header>
                     <Table.Row>
                         <Table.HeaderCell>時間</Table.HeaderCell>
