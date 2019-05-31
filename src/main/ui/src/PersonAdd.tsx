@@ -24,6 +24,7 @@ export const PersonAdd: React.FC<{ onSubmit: Dispatch<Person> }> = ({ onSubmit }
     const addPerson = () => {
         if (store.name && store.role && store.gender) {
             onSubmit(new Person(store.name, store.role, store.gender));
+            setStore({});
         }
     };
 
