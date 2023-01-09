@@ -11,7 +11,7 @@
     "@types/react-dom": "^16.8.4",
     "@types/semantic-ui": "^2.2.7",
     "lodash.isequal": "^4.5.0",
-    "luxon": "^1.15.0",
+    "luxon": "^1.28.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "^3.0.1",
